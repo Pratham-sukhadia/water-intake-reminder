@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Water Intake Reminder</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+        }
+
+        .container {
+            width: 420px;
+            margin: 70px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+            background: #e9f5ff;
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Water Intake Reminder</h2>
+
+    <input type="text" id="name" placeholder="Enter your name">
+    <input type="number" id="age" placeholder="Enter your age">
+    <input type="number" id="weight" placeholder="Enter your weight (kg)">
+
+    <select id="hours">
+        <option value="">Select Active Hours</option>
+        <option value="6">6 Hours</option>
+        <option value="10">10 Hours</option>
+        <option value="12">12 Hours</option>
+        <option value="14">14 Hours</option>
+    </select>
+
+    <select id="interval">
+        <option value="">Select Reminder Interval</option>
+        <option value="25">Every 25 Minutes</option>
+        <option value="45">Every 45 Minutes</option>
+        <option value="60">Every 1 Hour</option>
+    </select>
+
+    <button onclick="startReminder()">Start Reminder</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    let reminderTimer;
+
+    function startReminder() {
+        let name = document.getElementById("name").value;
+        let weight = document.getElementById("weight").value;
+        let hours = document.getElementById("hours").value;
+        let interval = document.getElementById("interval").value;
+
+        if (name === "" || weight === "" || hours === "" || interval === "") {
+            alert("Please fill all fields");
+            return;
+        }
+
+        // Water calculation (simple logic)
+        let dailyWater = (weight * 0.033).toFixed(2);
+        let perHour = (dailyWater / hours).toFixed(2);
+
+        document.getElementById("result").innerHTML =
+            "<strong>Hello " + name + "</strong><br><br>" +
+            "Daily Water Intake: " + dailyWater + " liters<br>" +
+            "Drink approx <strong>" + perHour +
+            " liters per hour</strong>.";
+
+        // Request notification permission
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        // Clear old reminder if exists
+        if (reminderTimer) {
+            clearInterval(reminderTimer);
+        }
+
+        // Start reminder
+        reminderTimer = setInterval(() => {
+            if (Notification.permission === "granted") {
+                new Notification("💧 Water Reminder", {
+                    body: "Time to drink water!",
+                });
+            }
+        }, interval * 60 * 1000);
+    }
+</script>
+
+</body>
+</html>
