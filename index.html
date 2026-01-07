@@ -5,209 +5,233 @@
 <title>Water Intake Reminder</title>
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f4f6f8;
-    }
-
-    .container {
-        width: 440px;
-        margin: 70px auto;
-        background: white;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 0 12px rgba(0,0,0,0.15);
-    }
-
-    h2 {
-        text-align: center;
-    }
-
-    input, select, button {
-        width: 100%;
-        padding: 10px;
-        margin-top: 10px;
-    }
-
-    button {
-        background: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-
-    button:hover {
-        background: #0056b3;
-    }
-
-    .done-btn {
-        background: #28a745;
-    }
-
-    .done-btn:disabled {
-        background: #999;
-        cursor: not-allowed;
-    }
-
-    .box {
-        margin-top: 15px;
-        background: #e9f5ff;
-        padding: 12px;
-        border-radius: 5px;
-    }
-
-    .milestone {
-        background: #f1f1f1;
-        font-size: 18px;
-    }
-
-    .stopwatch {
-        font-size: 22px;
-        animation: spin 2s linear infinite;
-        display: inline-block;
-    }
-
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
+:root{
+    --bg:#f4f6f8; --card:#fff; --text:#000; --accent:#0d6efd;
+}
+body.dark{
+    --bg:#121212; --card:#1e1e1e; --text:#fff;
+}
+body{
+    margin:0; font-family:Arial,sans-serif;
+    background:var(--bg); color:var(--text);
+}
+.container{
+    max-width:420px; margin:40px auto;
+    background:var(--card); padding:25px;
+    border-radius:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.2);
+}
+h2{text-align:center;}
+input,select,button{
+    width:100%; padding:12px; margin-top:12px;
+    border-radius:10px; border:1px solid #ccc;
+}
+button{
+    background:var(--accent); color:#fff;
+    border:none; font-size:16px;
+}
+.done-btn{background:#28a745;}
+.done-btn:disabled{background:#777;}
+.box{
+    margin-top:15px; padding:15px;
+    border-radius:12px; background:#e9f5ff;
+}
+body.dark .box{background:#2a2a2a;}
+.alarm{
+    display:none; background:#ffdddd;
+    padding:15px; border-radius:12px;
+    text-align:center; font-size:18px;
+    animation:pulse 1s infinite;
+}
+@keyframes pulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.05);}
+    100%{transform:scale(1);}
+}
+.toggle{
+    position:fixed; top:20px; right:20px;
+}
+.toggle input{display:none;}
+.toggle label{
+    width:55px;height:28px;background:#ccc;
+    display:block;border-radius:20px;position:relative;
+}
+.toggle label::after{
+    content:"";width:22px;height:22px;
+    background:#fff;position:absolute;
+    top:3px;left:3px;border-radius:50%;
+    transition:.3s;
+}
+.toggle input:checked+label{background:#0d6efd;}
+.toggle input:checked+label::after{left:30px;}
+.iphone-box{
+    background:#fff3cd;border-left:5px solid #ff9800;
+}
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <h2>💧 Water Intake Reminder</h2>
-
-    <input type="text" id="name" placeholder="Enter your name">
-    <input type="number" id="age" placeholder="Enter your age">
-    <input type="number" id="weight" placeholder="Enter your weight (kg)">
-
-    <select id="hours">
-        <option value="">Select Active Hours</option>
-        <option value="6">6 Hours</option>
-        <option value="10">10 Hours</option>
-        <option value="12">12 Hours</option>
-        <option value="14">14 Hours</option>
-    </select>
-
-    <select id="interval">
-        <option value="">Select Reminder Interval</option>
-        <option value="2">Every 2 Minutes (Demo)</option>
-        <option value="25">Every 25 Minutes</option>
-        <option value="30">Every 30 Minutes</option>
-        <option value="45">Every 45 Minutes</option>
-        <option value="60">Every 1 Hour</option>
-    </select>
-
-    <button onclick="startReminder()">Start Reminder</button>
-
-    <div class="box" id="result"></div>
-
-    <div class="box" id="countdownBox" style="display:none;">
-        <span class="stopwatch">⏱️</span><br>
-        ⏳ Next glass in: <strong><span id="countdown"></span></strong>
-    </div>
-
-    <button class="done-btn" id="doneBtn" style="display:none;" onclick="markDone()">
-        ✅ Done (I drank water)
-    </button>
-
-    <div class="box milestone" id="milestone" style="display:none;"></div>
+<!-- Dark Mode -->
+<div class="toggle">
+    <input type="checkbox" id="darkToggle" onchange="toggleDark()">
+    <label for="darkToggle"></label>
 </div>
 
-<script>
-let reminderTimer, countdownTimer;
-let glassCount = 0, maxGlasses = 0;
-let remainingSeconds = 0;
+<div class="container">
+<h2>💧 Water Intake Reminder</h2>
 
-function recommendInterval(activeHours) {
-    if (activeHours == 6) return 60;
-    if (activeHours == 10) return 45;
-    if (activeHours == 12) return 30;
-    if (activeHours == 14) return 25;
+<input id="name" placeholder="Name">
+<input id="age" type="number" placeholder="Age">
+<input id="weight" type="number" placeholder="Weight (kg)">
+
+<select id="hours">
+    <option value="">Active Hours</option>
+    <option value="6">6 Hours</option>
+    <option value="10">10 Hours</option>
+    <option value="12">12 Hours</option>
+    <option value="14">14 Hours</option>
+</select>
+
+<select id="interval">
+    <option value="">Interval (Auto)</option>
+    <option value="2">2 min (Demo)</option>
+    <option value="25">25 min</option>
+    <option value="30">30 min</option>
+    <option value="45">45 min</option>
+    <option value="60">60 min</option>
+</select>
+
+<button onclick="startReminder()">Start Reminder</button>
+
+<div class="box" id="result"></div>
+
+<div class="box" id="countdownBox" style="display:none;">
+⏳ Next glass in: <b id="countdown"></b>
+</div>
+
+<div class="alarm" id="alarmBox">🚨 TIME TO DRINK WATER 🥛</div>
+
+<button class="done-btn" id="doneBtn" style="display:none;" onclick="markDone()">
+✅ Yes, Water is Drank
+</button>
+
+<div class="box" id="milestone"></div>
+
+<!-- iPhone section -->
+<div class="box iphone-box" id="iphoneBox" style="display:none;">
+🍎 <b>iPhone User</b><br><br>
+Safari blocks web alarms.<br>
+Tap below to open Clock app and set alarm manually.<br><br>
+<button onclick="openIphoneAlarm()">⏰ Open iPhone Alarm</button>
+</div>
+
+</div>
+
+<audio id="beep" loop>
+<source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
+</audio>
+
+<script>
+let reminderTimer,countdownTimer,remainingSeconds=0;
+let glassCount=0,maxGlasses=0;
+
+function toggleDark(){document.body.classList.toggle("dark");}
+function isIphone(){return /iPhone|iPad|iPod/i.test(navigator.userAgent);}
+
+function recommendedInterval(h){
+    if(h==6) return 60;
+    if(h==10) return 45;
+    if(h==12) return 30;
+    if(h==14) return 25;
     return 60;
 }
 
-function startReminder() {
-    let name = document.getElementById("name").value;
-    let age = document.getElementById("age").value;
-    let weight = document.getElementById("weight").value;
-    let hours = document.getElementById("hours").value;
-    let interval = document.getElementById("interval").value;
+function startReminder(){
+    let n=name.value,a=age.value,w=weight.value,h=hours.value;
+    let i=interval.value;
 
-    if (name === "" || age === "" || weight === "" || hours === "") {
-        alert("Please fill all fields");
-        return;
-    }
+    if(!n||!a||!w||!h){alert("Fill all fields");return;}
+    if(!i) i=recommendedInterval(h);
 
-    // Auto recommend interval if not selected
-    if (interval === "") {
-        interval = recommendInterval(hours);
-    }
+    glassCount=0;
+    let daily=(w*0.033).toFixed(2);
+    maxGlasses=Math.ceil((daily*1000)/250);
 
-    glassCount = 0;
+    result.innerHTML=
+    `👋 Hello <b>${n}</b><br>
+     🎂 Age: ${a}<br>
+     ⚖️ Weight: ${w} kg<br>
+     💧 Target: <b>${daily} L</b><br>
+     🥛 Glasses: <b>${maxGlasses}</b><br>
+     ⏱ Interval: ${i} min`;
 
-    let dailyWater = (weight * 0.033).toFixed(2);
-    maxGlasses = Math.ceil((dailyWater * 1000) / 250);
-
-    document.getElementById("result").innerHTML =
-        "👋 Hello <strong>" + name + "</strong><br>" +
-        "🎂 Age: " + age + "<br>" +
-        "⚖️ Weight: " + weight + " kg<br><br>" +
-        "💧 Daily Target: <strong>" + dailyWater + " L</strong><br>" +
-        "🥛 Glass Goal: <strong>" + maxGlasses + "</strong><br>" +
-        "⏱️ Recommended Interval: <strong>Every " + interval + " minutes</strong>";
-
-    document.getElementById("doneBtn").style.display = "block";
-    document.getElementById("milestone").style.display = "block";
-    document.getElementById("countdownBox").style.display = "block";
-    document.getElementById("doneBtn").disabled = false;
+    doneBtn.style.display="block";
+    countdownBox.style.display="block";
+    milestone.innerHTML="";
+    doneBtn.disabled=false;
 
     clearInterval(reminderTimer);
     clearInterval(countdownTimer);
 
-    remainingSeconds = interval * 60;
+    remainingSeconds=i*60;
     updateCountdown();
+    countdownTimer=setInterval(updateCountdown,1000);
 
-    countdownTimer = setInterval(updateCountdown, 1000);
-
-    reminderTimer = setInterval(() => {
-        if (Notification.permission === "granted") {
-            new Notification("💧 Water Reminder", {
-                body: "Time to drink a glass of water 🥛"
-            });
-        }
-        remainingSeconds = interval * 60;
-    }, interval * 60 * 1000);
-
-    updateMilestone();
-}
-
-function updateCountdown() {
-    let min = Math.floor(remainingSeconds / 60);
-    let sec = remainingSeconds % 60;
-    document.getElementById("countdown").innerText = min + "m " + sec + "s";
-    remainingSeconds--;
-}
-
-function markDone() {
-    if (glassCount >= maxGlasses) return;
-
-    glassCount++;
-    updateMilestone();
-
-    if (glassCount === maxGlasses) {
-        alert("🎉 Great! You have completed your daily water intake milestone.");
-        document.getElementById("doneBtn").disabled = true;
+    if(isIphone()){
+        iphoneBox.style.display="block";
+    }else{
+        reminderTimer=setInterval(triggerAlarm,i*60*1000);
     }
 }
 
-function updateMilestone() {
-    document.getElementById("milestone").innerHTML =
-        "📊 Progress: " + glassCount + " / " + maxGlasses + "<br>" +
-        "🥛".repeat(glassCount);
+function triggerAlarm(){
+    alarmBox.style.display="block";
+    beep.play().catch(()=>{});
+    if(navigator.vibrate) navigator.vibrate([300,200,300]);
 }
+
+function updateCountdown(){
+    let m=Math.floor(remainingSeconds/60);
+    let s=remainingSeconds%60;
+    countdown.innerText=`${m}m ${s}s`;
+    remainingSeconds--;
+}
+
+function markDone(){
+    alarmBox.style.display="none";
+    beep.pause(); beep.currentTime=0;
+
+    if(glassCount>=maxGlasses) return;
+    glassCount++;
+
+    milestone.innerHTML=
+    `📊 Progress ${glassCount}/${maxGlasses}<br>`+"🥛".repeat(glassCount);
+
+    if(glassCount===maxGlasses){
+        alert("🎉 Great! Daily goal completed.");
+        doneBtn.disabled=true;
+    }
+}
+
+function openIphoneAlarm(){
+    window.location.href="clock-alarm://";
+}
+
+/* shortcuts */
+const name=document.getElementById("name");
+const age=document.getElementById("age");
+const weight=document.getElementById("weight");
+const hours=document.getElementById("hours");
+const interval=document.getElementById("interval");
+const result=document.getElementById("result");
+const countdown=document.getElementById("countdown");
+const countdownBox=document.getElementById("countdownBox");
+const alarmBox=document.getElementById("alarmBox");
+const milestone=document.getElementById("milestone");
+const doneBtn=document.getElementById("doneBtn");
+const iphoneBox=document.getElementById("iphoneBox");
+const beep=document.getElementById("beep");
 </script>
 
 </body>
