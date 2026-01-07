@@ -2,237 +2,519 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Water Intake Reminder</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HydratePro - Water Tracker</title>
 <style>
-:root{
-    --bg:#f4f6f8; --card:#fff; --text:#000; --accent:#0d6efd;
-}
-body.dark{
-    --bg:#121212; --card:#1e1e1e; --text:#fff;
-}
-body{
-    margin:0; font-family:Arial,sans-serif;
-    background:var(--bg); color:var(--text);
-}
-.container{
-    max-width:420px; margin:40px auto;
-    background:var(--card); padding:25px;
-    border-radius:18px;
-    box-shadow:0 10px 25px rgba(0,0,0,.2);
-}
-h2{text-align:center;}
-input,select,button{
-    width:100%; padding:12px; margin-top:12px;
-    border-radius:10px; border:1px solid #ccc;
-}
-button{
-    background:var(--accent); color:#fff;
-    border:none; font-size:16px;
-}
-.done-btn{background:#28a745;}
-.done-btn:disabled{background:#777;}
-.box{
-    margin-top:15px; padding:15px;
-    border-radius:12px; background:#e9f5ff;
-}
-body.dark .box{background:#2a2a2a;}
-.alarm{
-    display:none; background:#ffdddd;
-    padding:15px; border-radius:12px;
-    text-align:center; font-size:18px;
-    animation:pulse 1s infinite;
-}
-@keyframes pulse{
-    0%{transform:scale(1);}
-    50%{transform:scale(1.05);}
-    100%{transform:scale(1);}
-}
-.toggle{
-    position:fixed; top:20px; right:20px;
-}
-.toggle input{display:none;}
-.toggle label{
-    width:55px;height:28px;background:#ccc;
-    display:block;border-radius:20px;position:relative;
-}
-.toggle label::after{
-    content:"";width:22px;height:22px;
-    background:#fff;position:absolute;
-    top:3px;left:3px;border-radius:50%;
-    transition:.3s;
-}
-.toggle input:checked+label{background:#0d6efd;}
-.toggle input:checked+label::after{left:30px;}
-.iphone-box{
-    background:#fff3cd;border-left:5px solid #ff9800;
-}
+    /* --- CSS Variables & Reset --- */
+    :root {
+        --bg-color: #f0f4f8;
+        --card-bg: #ffffff;
+        --text-main: #2d3748;
+        --text-muted: #718096;
+        --primary: #3182ce;
+        --primary-hover: #2b6cb0;
+        --accent: #48bb78;
+        --danger: #e53e3e;
+        --input-bg: #edf2f7;
+        --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --radius: 16px;
+        --transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] {
+        --bg-color: #1a202c;
+        --card-bg: #2d3748;
+        --text-main: #f7fafc;
+        --text-muted: #a0aec0;
+        --primary: #63b3ed;
+        --primary-hover: #4299e1;
+        --input-bg: #4a5568;
+    }
+
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        padding-bottom: 80px; /* Space for toggle */
+    }
+
+    /* --- Container & Typography --- */
+    .container {
+        width: 100%;
+        max-width: 480px;
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 30px 25px;
+        transition: var(--transition);
+    }
+
+    h1 { margin: 0 0 5px 0; text-align: center; font-size: 1.8rem; color: var(--primary); }
+    p.subtitle { margin: 0 0 25px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+
+    /* --- Form Elements --- */
+    .input-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    .full-width { grid-column: span 2; }
+
+    input, select {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        border: 2px solid transparent;
+        background: var(--input-bg);
+        color: var(--text-main);
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+    input:focus, select:focus {
+        border-color: var(--primary);
+        background: var(--card-bg);
+    }
+
+    /* --- Buttons --- */
+    .btn {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.1s, background 0.3s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+    .btn:active { transform: scale(0.98); }
+    
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3); }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .btn-success { background: var(--accent); color: white; display: none; margin-top: 20px; }
+    .btn-success:disabled { background: var(--text-muted); cursor: not-allowed; opacity: 0.7; }
+
+    .btn-warning { background: #ed8936; color: white; margin-top: 10px; font-size: 0.9rem; }
+
+    /* --- Dashboard Area --- */
+    .dashboard {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid var(--input-bg);
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .stat-box { background: var(--input-bg); padding: 10px; border-radius: 10px; }
+    .stat-val { display: block; font-weight: bold; font-size: 1.1rem; color: var(--primary); }
+    .stat-label { font-size: 0.75rem; color: var(--text-muted); }
+
+    .timer-display {
+        background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .timer-display h3 { margin: 0; font-size: 2.5rem; font-family: monospace; }
+    .timer-display span { font-size: 0.9rem; opacity: 0.9; }
+
+    /* --- Progress Bar --- */
+    .progress-container {
+        height: 10px;
+        background: var(--input-bg);
+        border-radius: 5px;
+        overflow: hidden;
+        margin: 15px 0;
+    }
+    .progress-bar {
+        height: 100%;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .progress-text { text-align: center; font-size: 0.9rem; color: var(--text-muted); }
+
+    /* --- Alarm Modal --- */
+    .alarm-modal {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.85);
+        z-index: 1000;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(5px);
+    }
+    .alarm-content {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        max-width: 90%;
+    }
+    .water-icon { font-size: 4rem; animation: bounce 1s infinite; display: block; margin-bottom: 20px; }
+    .alarm-title { font-size: 1.5rem; color: #2d3748; margin-bottom: 20px; font-weight: bold; }
+
+    /* --- Theme Toggle Switch (Bottom) --- */
+    .theme-wrapper {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        background: var(--card-bg);
+        padding: 8px;
+        border-radius: 30px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+    
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 70px;
+        height: 34px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    
+    .slider {
+        position: absolute; cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #cbd5e0;
+        transition: .4s;
+        border-radius: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 8px;
+        box-sizing: border-box;
+    }
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+        z-index: 2;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    input:checked + .slider { background-color: var(--primary); }
+    input:checked + .slider:before { transform: translateX(36px); }
+
+    /* Icons inside toggle */
+    .icon-sun, .icon-moon { font-size: 14px; line-height: 1; z-index: 1; user-select: none;}
+    .icon-moon { color: white; } 
+    .icon-sun { color: #f6ad55; }
+
+    /* --- Animations --- */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    /* Mobile Tweaks */
+    @media (max-width: 480px) {
+        .input-group { grid-template-columns: 1fr; }
+        .full-width { grid-column: auto; }
+        .container { padding: 20px; }
+    }
 </style>
 </head>
-
 <body>
 
-<!-- Dark Mode -->
-<div class="toggle">
-    <input type="checkbox" id="darkToggle" onchange="toggleDark()">
-    <label for="darkToggle"></label>
-</div>
-
 <div class="container">
-<h2>💧 Water Intake Reminder</h2>
+    <h1>💧 HydratePro</h1>
+    <p class="subtitle">Smart Water Intake Reminder</p>
 
-<input id="name" placeholder="Name">
-<input id="age" type="number" placeholder="Age">
-<input id="weight" type="number" placeholder="Weight (kg)">
+    <div id="setupForm">
+        <div class="input-group full-width">
+            <input id="name" type="text" placeholder="Your Name">
+        </div>
+        <div class="input-group">
+            <input id="weight" type="number" placeholder="Weight (kg)">
+            <select id="hours">
+                <option value="" disabled selected>Work Hours</option>
+                <option value="6">6 Hours</option>
+                <option value="8">8 Hours</option>
+                <option value="10">10 Hours</option>
+                <option value="12">12 Hours</option>
+            </select>
+        </div>
+        <div class="input-group full-width">
+            <select id="interval">
+                <option value="" selected>Auto-Calculate Interval</option>
+                <option value="1">1 min (Demo Mode)</option>
+                <option value="30">30 Minutes</option>
+                <option value="45">45 Minutes</option>
+                <option value="60">60 Minutes</option>
+            </select>
+        </div>
+        <button class="btn btn-primary" onclick="startSystem()">
+            <span>🚀 Start Tracking</span>
+        </button>
+    </div>
 
-<select id="hours">
-    <option value="">Active Hours</option>
-    <option value="6">6 Hours</option>
-    <option value="10">10 Hours</option>
-    <option value="12">12 Hours</option>
-    <option value="14">14 Hours</option>
-</select>
+    <div id="dashboard" class="dashboard">
+        <div class="stats-grid">
+            <div class="stat-box"><span class="stat-val" id="dispGoal">0L</span><span class="stat-label">Daily Goal</span></div>
+            <div class="stat-box"><span class="stat-val" id="dispTotalGlasses">0</span><span class="stat-label">Total Glasses</span></div>
+            <div class="stat-box"><span class="stat-val" id="dispNext">--</span><span class="stat-label">Interval</span></div>
+        </div>
 
-<select id="interval">
-    <option value="">Interval (Auto)</option>
-    <option value="2">2 min (Demo)</option>
-    <option value="25">25 min</option>
-    <option value="30">30 min</option>
-    <option value="45">45 min</option>
-    <option value="60">60 min</option>
-</select>
+        <div class="timer-display">
+            <span>Next Drink In</span>
+            <h3 id="countdown">00:00</h3>
+        </div>
 
-<button onclick="startReminder()">Start Reminder</button>
+        <div class="progress-text">
+            Consumed: <span id="progressText">0 / 0</span> Glasses
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
 
-<div class="box" id="result"></div>
+        <button class="btn btn-success" id="drinkBtn" onclick="recordDrink()">
+            🥤 I Drank Water
+        </button>
 
-<div class="box" id="countdownBox" style="display:none;">
-⏳ Next glass in: <b id="countdown"></b>
+        <div id="iosWarning" style="display:none; margin-top:15px; background:#fffaf0; padding:10px; border-radius:8px; border:1px solid #fbd38d; color:#744210; font-size:0.85rem;">
+            ⚠️ <b>iPhone Users:</b> Safari blocks auto-sounds. Please manually set an alarm if the sound doesn't play.
+            <button class="btn btn-warning" onclick="window.location.href='clock-alarm://'">Set System Alarm</button>
+        </div>
+    </div>
 </div>
 
-<div class="alarm" id="alarmBox">🚨 TIME TO DRINK WATER 🥛</div>
-
-<button class="done-btn" id="doneBtn" style="display:none;" onclick="markDone()">
-✅ Yes, Water is Drank
-</button>
-
-<div class="box" id="milestone"></div>
-
-<!-- iPhone section -->
-<div class="box iphone-box" id="iphoneBox" style="display:none;">
-🍎 <b>iPhone User</b><br><br>
-Safari blocks web alarms.<br>
-Tap below to open Clock app and set alarm manually.<br><br>
-<button onclick="openIphoneAlarm()">⏰ Open iPhone Alarm</button>
+<div class="alarm-modal" id="alarmModal">
+    <div class="alarm-content">
+        <span class="water-icon">🥤</span>
+        <div class="alarm-title">Time to Hydrate!</div>
+        <p style="color:#718096; margin-bottom:25px;">Take a break and drink a glass of water.</p>
+        <button class="btn btn-primary" onclick="dismissAlarm()">Okay, Drinking Now</button>
+    </div>
 </div>
 
+<div class="theme-wrapper">
+    <label class="toggle-switch">
+        <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+        <span class="slider">
+            <span class="icon-sun">☀️</span>
+            <span class="icon-moon">🌙</span>
+        </span>
+    </label>
 </div>
-
-<audio id="beep" loop>
-<source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
-</audio>
 
 <script>
-let reminderTimer,countdownTimer,remainingSeconds=0;
-let glassCount=0,maxGlasses=0;
+    /* --- State Management --- */
+    let state = {
+        active: false,
+        timer: null,
+        secondsLeft: 0,
+        intervalMinutes: 0,
+        glassCount: 0,
+        maxGlasses: 0,
+        audioContext: null
+    };
 
-function toggleDark(){document.body.classList.toggle("dark");}
-function isIphone(){return /iPhone|iPad|iPod/i.test(navigator.userAgent);}
+    /* --- DOM Elements --- */
+    const els = {
+        setup: document.getElementById('setupForm'),
+        dash: document.getElementById('dashboard'),
+        countdown: document.getElementById('countdown'),
+        pBar: document.getElementById('progressBar'),
+        pText: document.getElementById('progressText'),
+        modal: document.getElementById('alarmModal'),
+        drinkBtn: document.getElementById('drinkBtn')
+    };
 
-function recommendedInterval(h){
-    if(h==6) return 60;
-    if(h==10) return 45;
-    if(h==12) return 30;
-    if(h==14) return 25;
-    return 60;
-}
+    /* --- Audio System (Base64 for reliability) --- */
+    // Simple digital chime sound
+    const audioSrc = "data:audio/wav;base64,UklGRl9vT1BXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"; // Shortened placeholder, full code uses AudioContext below
+    
+    // Better Audio: Oscillator (No files needed)
+    function playChime() {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(500, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.1);
+        
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
 
-function startReminder(){
-    let n=name.value,a=age.value,w=weight.value,h=hours.value;
-    let i=interval.value;
-
-    if(!n||!a||!w||!h){alert("Fill all fields");return;}
-    if(!i) i=recommendedInterval(h);
-
-    glassCount=0;
-    let daily=(w*0.033).toFixed(2);
-    maxGlasses=Math.ceil((daily*1000)/250);
-
-    result.innerHTML=
-    `👋 Hello <b>${n}</b><br>
-     🎂 Age: ${a}<br>
-     ⚖️ Weight: ${w} kg<br>
-     💧 Target: <b>${daily} L</b><br>
-     🥛 Glasses: <b>${maxGlasses}</b><br>
-     ⏱ Interval: ${i} min`;
-
-    doneBtn.style.display="block";
-    countdownBox.style.display="block";
-    milestone.innerHTML="";
-    doneBtn.disabled=false;
-
-    clearInterval(reminderTimer);
-    clearInterval(countdownTimer);
-
-    remainingSeconds=i*60;
-    updateCountdown();
-    countdownTimer=setInterval(updateCountdown,1000);
-
-    if(isIphone()){
-        iphoneBox.style.display="block";
-    }else{
-        reminderTimer=setInterval(triggerAlarm,i*60*1000);
+        // Vibrate for mobile
+        if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
     }
-}
 
-function triggerAlarm(){
-    alarmBox.style.display="block";
-    beep.play().catch(()=>{});
-    if(navigator.vibrate) navigator.vibrate([300,200,300]);
-}
-
-function updateCountdown(){
-    let m=Math.floor(remainingSeconds/60);
-    let s=remainingSeconds%60;
-    countdown.innerText=`${m}m ${s}s`;
-    remainingSeconds--;
-}
-
-function markDone(){
-    alarmBox.style.display="none";
-    beep.pause(); beep.currentTime=0;
-
-    if(glassCount>=maxGlasses) return;
-    glassCount++;
-
-    milestone.innerHTML=
-    `📊 Progress ${glassCount}/${maxGlasses}<br>`+"🥛".repeat(glassCount);
-
-    if(glassCount===maxGlasses){
-        alert("🎉 Great! Daily goal completed.");
-        doneBtn.disabled=true;
+    /* --- Core Logic --- */
+    function toggleTheme() {
+        const isDark = document.getElementById('themeToggle').checked;
+        document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
     }
-}
 
-function openIphoneAlarm(){
-    window.location.href="clock-alarm://";
-}
+    function calculateNeeds(weight) {
+        // Approx 0.033L per kg
+        const liters = (weight * 0.033).toFixed(2);
+        const glasses = Math.ceil((liters * 1000) / 250); // Assuming 250ml glass
+        return { liters, glasses };
+    }
 
-/* shortcuts */
-const name=document.getElementById("name");
-const age=document.getElementById("age");
-const weight=document.getElementById("weight");
-const hours=document.getElementById("hours");
-const interval=document.getElementById("interval");
-const result=document.getElementById("result");
-const countdown=document.getElementById("countdown");
-const countdownBox=document.getElementById("countdownBox");
-const alarmBox=document.getElementById("alarmBox");
-const milestone=document.getElementById("milestone");
-const doneBtn=document.getElementById("doneBtn");
-const iphoneBox=document.getElementById("iphoneBox");
-const beep=document.getElementById("beep");
+    function startSystem() {
+        const name = document.getElementById('name').value;
+        const weight = document.getElementById('weight').value;
+        const hours = document.getElementById('hours').value;
+        let interval = document.getElementById('interval').value;
+
+        if(!name || !weight || !hours) {
+            alert("Please fill in your details properly.");
+            return;
+        }
+
+        // Auto calculate interval if not selected
+        if(!interval) {
+            // Rough logic: Work minutes / glasses needed
+            const { glasses } = calculateNeeds(weight);
+            const workMinutes = hours * 60;
+            interval = Math.floor(workMinutes / glasses);
+            if (interval < 15) interval = 15; // Minimum cap
+        }
+
+        const stats = calculateNeeds(weight);
+        state.maxGlasses = stats.glasses;
+        state.intervalMinutes = parseInt(interval);
+        
+        // Update UI
+        document.getElementById('dispGoal').innerText = stats.liters + 'L';
+        document.getElementById('dispTotalGlasses').innerText = stats.glasses;
+        document.getElementById('dispNext').innerText = state.intervalMinutes + 'm';
+        
+        els.setup.style.display = 'none';
+        els.dash.style.display = 'block';
+        els.drinkBtn.style.display = 'flex';
+
+        if(/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            document.getElementById('iosWarning').style.display = 'block';
+        }
+
+        updateProgress();
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(state.timer);
+        state.secondsLeft = state.intervalMinutes * 60;
+        
+        updateTimerDisplay();
+
+        state.timer = setInterval(() => {
+            state.secondsLeft--;
+            updateTimerDisplay();
+
+            if (state.secondsLeft <= 0) {
+                triggerAlarm();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const m = Math.floor(state.secondsLeft / 60);
+        const s = state.secondsLeft % 60;
+        els.countdown.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function triggerAlarm() {
+        clearInterval(state.timer);
+        playChime();
+        // Play sound loop attempt
+        const loopInterval = setInterval(playChime, 2000);
+        
+        els.modal.style.display = 'flex';
+        
+        // Store interval ID on modal to clear it later
+        els.modal.dataset.loopId = loopInterval;
+    }
+
+    function dismissAlarm() {
+        const loopId = els.modal.dataset.loopId;
+        if(loopId) clearInterval(loopId);
+        
+        els.modal.style.display = 'none';
+        // Wait for user to actually click "I Drank Water" button in dashboard
+        // Or we can auto-trigger it here:
+        // recordDrink(); // Optional: uncomment if 'Okay' means 'I drank it'
+    }
+
+    function recordDrink() {
+        // If coming from button click and alarm wasn't triggered yet
+        clearInterval(state.timer); // Reset timer
+
+        if (state.glassCount < state.maxGlasses) {
+            state.glassCount++;
+            updateProgress();
+            
+            if (state.glassCount >= state.maxGlasses) {
+                els.countdown.innerText = "Goal Reached! 🎉";
+                els.drinkBtn.disabled = true;
+                els.drinkBtn.innerText = "Daily Goal Complete";
+                // Confetti logic could go here
+            } else {
+                startTimer(); // Restart cycle
+            }
+        }
+    }
+
+    function updateProgress() {
+        els.pText.innerText = `${state.glassCount} / ${state.maxGlasses}`;
+        const pct = (state.glassCount / state.maxGlasses) * 100;
+        els.pBar.style.width = `${pct}%`;
+    }
+
+    // Initialize Audio Context on first click interaction to bypass browser policies
+    document.body.addEventListener('click', function() {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext && !state.audioContext) {
+            state.audioContext = new AudioContext();
+            state.audioContext.resume();
+        }
+    }, { once: true });
+
 </script>
-
 </body>
 </html>
