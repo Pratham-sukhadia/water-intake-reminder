@@ -2,600 +2,577 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#4f46e5">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>HealthHub Pro | Final</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HealthHub Pro | Voice Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
     :root {
-        /* --- THEME COLORS --- */
+        --text: #1e293b;
+        --text-muted: #64748b;
         --primary: #4f46e5;
-        --primary-glow: rgba(79, 70, 229, 0.4);
-        --accent: #ec4899;
         
-        /* Light Mode */
-        --bg-body: #f8fafc;
-        --surface: #ffffff;
-        --text-main: #0f172a;
-        --text-sub: #64748b;
-        --input-bg: #f1f5f9;
-        --border: #e2e8f0;
-        --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        
-        /* Gradient Backgrounds */
-        --gradient-day: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-        --gradient-night: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        /* Glass Vars */
+        --glass-bg: rgba(255, 255, 255, 0.65);
+        --glass-border: rgba(255, 255, 255, 0.4);
+        --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        --input-bg: rgba(255, 255, 255, 0.5);
     }
 
     [data-theme="dark"] {
-        --bg-body: #020617;
-        --surface: #1e293b;
-        --text-main: #f8fafc;
-        --text-sub: #94a3b8;
-        --input-bg: #334155;
-        --border: #475569;
-        --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --primary: #818cf8;
+        --glass-bg: rgba(30, 41, 59, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        --input-bg: rgba(0, 0, 0, 0.3);
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
     body {
         margin: 0;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background: var(--gradient-day);
-        color: var(--text-main);
-        height: 100dvh; /* Dynamic Height Fix */
+        font-family: 'Outfit', sans-serif;
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        overflow: hidden;
-        transition: background 0.5s;
+        padding: 20px;
+        overflow-x: hidden;
+        color: var(--text);
+        
+        /* --- CHANGING BACKGROUND ANIMATION --- */
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
     }
-    
-    [data-theme="dark"] body { background: var(--gradient-night); }
 
-    /* --- APP SHELL --- */
-    .app-shell {
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* --- Glass Container --- */
+    .app-container {
         width: 100%;
-        height: 100%;
-        background: var(--surface);
-        display: flex;
-        flex-direction: column;
+        max-width: 420px;
         position: relative;
-        overflow: hidden;
+        z-index: 10;
     }
 
-    /* Tablet/Desktop Mode */
-    @media (min-width: 768px) {
-        body { padding: 40px; }
-        .app-shell {
-            width: 420px;
-            height: 90vh;
-            max-height: 850px;
-            border-radius: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            border: 4px solid rgba(255,255,255,0.2);
-        }
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-top: 1px solid rgba(255,255,255,0.8);
+        border-radius: 32px;
+        box-shadow: var(--glass-shadow);
+        padding: 30px;
+        transition: 0.4s ease;
+        display: none;
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
     }
+    .glass-card.active { display: block; opacity: 1; transform: translateY(0) scale(1); }
 
-    /* --- HEADER --- */
-    .header {
-        padding: 16px 24px;
-        padding-top: max(16px, env(safe-area-inset-top));
-        display: flex; justify-content: space-between; align-items: center;
-        background: var(--surface);
-        border-bottom: 1px solid var(--border);
-        z-index: 50;
-    }
-    .user-pill { display: flex; align-items: center; gap: 12px; }
-    .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: var(--input-bg); }
-    .theme-btn {
-        width: 40px; height: 40px; border-radius: 12px;
-        background: var(--input-bg); border: 1px solid var(--border);
-        color: var(--text-main); display: flex; align-items: center; justify-content: center;
-        cursor: pointer; font-size: 1.2rem; transition: 0.2s;
-    }
+    /* --- Typography & Inputs --- */
+    h1 { font-size: 2rem; font-weight: 700; margin: 0 0 5px 0; text-align: center; letter-spacing: -0.5px; }
+    h2 { font-size: 1.4rem; margin: 0 0 20px 0; }
+    p.sub { text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px; }
 
-    /* --- SCROLL CONTENT --- */
-    .content {
-        flex: 1;
-        overflow-y: auto;
-        padding: 24px;
-        padding-bottom: 140px; /* Space for nav */
-        scroll-behavior: smooth;
-    }
+    label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin: 0 0 8px 10px; }
     
-    /* --- INPUTS & LAYOUT (THE FIX) --- */
-    .form-group { margin-bottom: 20px; }
-    
-    label {
-        display: block; font-size: 0.75rem; font-weight: 700;
-        text-transform: uppercase; color: var(--text-sub);
-        margin-bottom: 8px; letter-spacing: 0.5px;
-    }
-
-    .input-box {
-        width: 100%; padding: 16px;
-        border-radius: 16px;
-        border: 2px solid var(--border);
+    input, select, textarea {
+        width: 100%; padding: 16px 20px; border-radius: 20px;
+        border: 1px solid var(--glass-border);
         background: var(--input-bg);
-        color: var(--text-main);
-        font-family: inherit; font-size: 1rem;
-        transition: 0.2s;
-        -webkit-appearance: none;
+        color: var(--text); font-family: inherit; font-size: 1rem;
+        transition: 0.3s; margin-bottom: 20px;
+        backdrop-filter: blur(5px);
     }
-    .input-box:focus { border-color: var(--primary); background: var(--surface); }
+    textarea { resize: none; height: 80px; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); background: rgba(255,255,255,0.1); }
 
-    /* !!! CRITICAL FIX: VERTICAL STACK ON MOBILE !!! */
-    .mobile-stack {
-        display: flex;
-        flex-direction: column; /* Stack vertically by default */
-        gap: 15px;
+    /* --- Profile Upload --- */
+    .profile-upload {
+        width: 100px; height: 100px; margin: 0 auto 20px;
+        border-radius: 50%; overflow: hidden;
+        border: 2px dashed var(--glass-border);
+        background: var(--input-bg);
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; position: relative; transition: 0.3s;
+    }
+    .profile-upload:hover { border-color: var(--primary); transform: scale(1.05); }
+    .profile-upload img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .profile-upload i { font-size: 1.5rem; color: var(--text-muted); }
+
+    /* --- Liquid Button --- */
+    .btn-liquid {
+        width: 100%; padding: 18px; border-radius: 24px;
+        border: 1px solid rgba(255,255,255,0.3);
+        background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+        color: white; font-weight: 600; font-size: 1.1rem;
+        position: relative; overflow: hidden; cursor: pointer;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.2);
+        transition: 0.3s;
+    }
+    .btn-liquid::before {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(90deg, #4f46e5, #ec4899);
+        z-index: -1; opacity: 0.8; transition: 0.3s;
+    }
+    .btn-liquid::after {
+        content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        transform: skewX(-20deg); transition: 0.5s;
+    }
+    .btn-liquid:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3); }
+    .btn-liquid:hover::after { left: 100%; transition: 0.7s; }
+    .btn-liquid:active { transform: scale(0.98); }
+
+    /* --- App Header & Profile --- */
+    .app-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; }
+    .user-info { display: flex; align-items: center; gap: 15px; }
+    .user-avatar {
+        width: 50px; height: 50px; border-radius: 50%;
+        background: var(--input-bg); border: 2px solid rgba(255,255,255,0.5);
+        object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     
-    /* Only allow side-by-side on wider screens */
-    @media (min-width: 480px) {
-        .mobile-stack { flex-direction: row; }
-        .mobile-stack > div { flex: 1; }
+    /* --- Tabs --- */
+    .tabs { display: flex; background: var(--input-bg); padding: 5px; border-radius: 20px; margin-bottom: 30px; }
+    .tab {
+        flex: 1; padding: 12px; border: none; background: transparent;
+        border-radius: 16px; color: var(--text-muted); font-weight: 600;
+        cursor: pointer; transition: 0.3s;
+    }
+    .tab.active { background: #fff; color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    [data-theme="dark"] .tab.active { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* --- Frequency Buttons --- */
+    .freq-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+    .freq-btn {
+        padding: 12px; border-radius: 16px; border: 1px solid var(--glass-border);
+        background: var(--input-bg); color: var(--text-muted); cursor: pointer; transition: 0.3s;
+    }
+    .freq-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3); }
+
+    /* --- NEW DAYS SELECTOR UI --- */
+    .days-wrapper {
+        display: flex; justify-content: space-between; gap: 5px; margin-bottom: 25px;
+    }
+    .day-pill {
+        width: 42px; height: 42px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%; /* Circle shape */
+        background: var(--input-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--text-muted);
+        font-weight: 700; font-size: 0.85rem;
+        cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        user-select: none;
+    }
+    .day-pill input { display: none; } /* Hide checkbox */
+    
+    /* Active State for Days */
+    .day-pill.selected {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: translateY(-2px) scale(1.1);
+        box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
     }
 
-    /* Wrap Container for Medication Times (Prevents overflow) */
-    .wrap-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-    .wrap-container input {
-        flex: 1 1 40%; /* Grow, Shrink, Basis 40% */
-        min-width: 100px;
-    }
-
-    /* --- BUTTONS --- */
-    .btn-main {
-        width: 100%; padding: 18px; border-radius: 18px;
-        background: var(--primary); color: white; border: none;
-        font-size: 1rem; font-weight: 700; cursor: pointer;
-        display: flex; align-items: center; justify-content: center; gap: 8px;
-        box-shadow: 0 8px 20px -6px var(--primary-glow);
-        transition: transform 0.1s;
-    }
-    .btn-main:active { transform: scale(0.98); }
-    .btn-sec { background: transparent; border: 2px solid var(--border); color: var(--text-sub); box-shadow: none; }
-
-    /* --- CARDS --- */
-    .card {
-        background: var(--surface); padding: 20px; border-radius: 24px;
-        margin-bottom: 20px; border: 1px solid var(--border);
-        box-shadow: var(--shadow);
-    }
-
-    /* --- VISUALS --- */
-    .water-ring { position: relative; width: 200px; height: 200px; margin: 0 auto 30px; }
-    svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-    circle { fill: none; stroke-width: 18; stroke-linecap: round; }
-    .track { stroke: var(--input-bg); }
-    .fill { stroke: #0ea5e9; stroke-dasharray: 565; stroke-dashoffset: 565; transition: 1s ease; }
+    /* --- Med & Water Items --- */
+    .water-ring { width: 160px; height: 160px; margin: 0 auto 30px; position: relative; }
+    .water-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .water-ring circle { fill: none; stroke-width: 15; stroke-linecap: round; cx: 80; cy: 80; r: 70; }
+    .ring-bg { stroke: rgba(0,0,0,0.05); }
+    [data-theme="dark"] .ring-bg { stroke: rgba(255,255,255,0.05); }
+    .ring-val { stroke: #0ea5e9; stroke-dasharray: 440; stroke-dashoffset: 440; transition: 1s linear; filter: drop-shadow(0 0 10px #0ea5e9); }
     
     .med-item {
-        background: var(--surface); padding: 16px; border-radius: 20px;
-        margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
-        border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        background: rgba(255,255,255,0.5); backdrop-filter: blur(5px);
+        padding: 15px 20px; border-radius: 20px; margin-bottom: 12px;
+        display: flex; justify-content: space-between; align-items: center;
+        border-left: 5px solid #ec4899;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.02);
     }
-    .med-actions button {
-        width: 38px; height: 38px; border-radius: 10px; border: none;
-        background: var(--input-bg); color: var(--text-sub); margin-left: 5px;
-        cursor: pointer; display: flex; align-items: center; justify-content: center;
-    }
+    [data-theme="dark"] .med-item { background: rgba(0,0,0,0.2); }
 
-    /* --- NAVIGATION --- */
-    .nav-bar {
-        position: absolute; bottom: 0; left: 0; right: 0;
-        background: var(--surface); border-top: 1px solid var(--border);
-        padding: 12px 20px; padding-bottom: max(12px, env(safe-area-inset-bottom));
-        display: flex; justify-content: space-around; z-index: 100;
-    }
-    .nav-btn {
-        background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px;
-        color: var(--text-sub); opacity: 0.5; transition: 0.2s; flex: 1; cursor: pointer;
-    }
-    .nav-btn.active { opacity: 1; color: var(--primary); transform: translateY(-3px); }
-    .nav-btn i { font-size: 1.5rem; }
-    .nav-btn span { font-size: 0.7rem; font-weight: 700; }
-
-    /* --- COMPONENTS --- */
-    .day-selector { display: flex; justify-content: space-between; gap: 4px; margin-bottom: 20px; }
-    .day-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-sub); font-weight: 700; cursor: pointer; }
-    .day-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-    /* --- ANIMATIONS --- */
-    .view-section { display: none; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-    .view-section.active { display: block; }
-    @keyframes slideUp { from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);} }
+    /* --- Helper Classes --- */
+    .hidden { display: none; }
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .loader { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; margin: 0 auto 20px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
 
     /* Modal */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-    .modal-box { background: var(--surface); width: 85%; max-width: 320px; padding: 25px; border-radius: 24px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); border: 1px solid var(--border); }
-
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 999; display: none; align-items: center; justify-content: center; }
+    .modal-box { background: #fff; padding: 40px; border-radius: 30px; text-align: center; width: 90%; max-width: 320px; animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    [data-theme="dark"] .modal-box { background: #1e293b; }
+    @keyframes popUp { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
+    
+    .theme-toggle { position: fixed; top: 20px; right: 20px; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(255,255,255,0.3); color: white; backdrop-filter: blur(5px); }
 </style>
 </head>
 <body>
 
-<div class="app-shell">
+<button class="theme-toggle" onclick="toggleTheme()">🌗</button>
 
-    <div id="header_bar" class="header" style="display:none;">
-        <div class="user-pill">
-            <img id="head_avatar" src="" class="avatar">
-            <div>
-                <div style="font-size:0.75rem; opacity:0.8;" data-key="welcome">Welcome</div>
-                <div id="head_name" style="font-weight:700;">User</div>
-            </div>
+<div class="app-container">
+
+    <div id="loginView" class="glass-card active">
+        <div style="text-align: center;">
+            <label for="u_img_input" class="profile-upload" id="profilePreview">
+                <i class="icon">📷</i>
+                <img id="previewImg" src="" alt="">
+            </label>
+            <input type="file" id="u_img_input" accept="image/*" hidden onchange="handleImageUpload(event)">
+            <p style="font-size:0.8rem; opacity:0.7; margin-top:-10px;">Tap to add photo</p>
         </div>
-        <button class="theme-btn" onclick="toggleTheme()"><i class="fas fa-palette"></i></button>
+
+        <h1>HealthHub Pro</h1>
+        <p class="sub">Wellness & Reminder System</p>
+
+        <label>Name</label>
+        <input type="text" id="u_name" placeholder="John Doe">
+
+        <label>Date of Birth</label>
+        <input type="date" id="u_dob">
+
+        <button class="btn-liquid" onclick="handleLogin()">Get Started</button>
     </div>
 
-    <div class="content">
-
-        <div id="view_login" class="view-section active">
-            <div style="text-align:center; margin: 40px 0;">
-                <div style="width:70px; height:70px; background:var(--primary); color:white; border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 15px; box-shadow: 0 10px 20px -5px var(--primary);">
-                    <i class="fas fa-heart-pulse"></i>
-                </div>
-                <h1 style="margin:0; font-size:2rem;" data-key="appTitle">HealthHub</h1>
-                <p style="margin-top:5px; opacity:0.7;" data-key="appSub">Wellness Companion</p>
-            </div>
-
-            <div class="card">
-                <div style="text-align:center; margin-bottom:20px;">
-                    <label for="u_img" style="display:inline-block; width:100px; height:100px; border-radius:50%; background:var(--input-bg); border:2px dashed var(--text-sub); position:relative; overflow:hidden; cursor:pointer;">
-                        <img id="img_preview" style="width:100%; height:100%; object-fit:cover; display:none;">
-                        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-camera" id="cam_icon" style="font-size:1.5rem; opacity:0.5;"></i></div>
-                    </label>
-                    <input type="file" id="u_img" hidden accept="image/*" onchange="loadImg(event)">
-                </div>
-
-                <div class="form-group">
-                    <label data-key="lblName">Your Name</label>
-                    <input type="text" id="u_name" class="input-box" data-key-ph="phName" placeholder="Name">
-                </div>
-
-                <div class="mobile-stack form-group">
-                    <div><label data-key="lblDob">DOB</label><input type="date" id="u_dob" class="input-box" onchange="calcAge()"></div>
-                    <div><label data-key="lblAge">Age</label><input type="text" id="u_age" class="input-box" readonly style="text-align:center;"></div>
-                </div>
-
-                <div class="form-group">
-                    <label data-key="lblLang">Language</label>
-                    <select id="u_lang" class="input-box" onchange="changeLang(this.value)">
-                        <option value="en">English</option>
-                        <option value="hi">Hindi (हिंदी)</option>
-                        <option value="gu">Gujarati (ગુજરાતી)</option>
-                    </select>
-                </div>
-
-                <button class="btn-main" onclick="doLogin()">
-                    <span data-key="btnStart">Start Journey</span> <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-        </div>
-
-        <div id="view_water_setup" class="view-section">
-            <h2 style="margin-bottom:20px;" data-key="hWaterSetup">Hydration Plan</h2>
-            <div class="card">
-                <div class="form-group">
-                    <label data-key="lblWeight">Weight (KG)</label>
-                    <input type="number" id="w_weight" class="input-box" placeholder="70">
-                </div>
-                
-                <div class="mobile-stack form-group">
-                    <div>
-                        <label data-key="lblWake">Wake Up</label>
-                        <input type="time" id="w_wake" class="input-box" value="07:00">
-                    </div>
-                    <div>
-                        <label data-key="lblBed">Bed Time</label>
-                        <input type="time" id="w_bed" class="input-box" value="23:00">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label data-key="lblInterval">Interval</label>
-                    <select id="w_int" class="input-box">
-                        <option value="2">2 Mins (Demo)</option>
-                        <option value="30">30 Mins</option>
-                        <option value="60" selected>1 Hour</option>
-                    </select>
-                </div>
-                <button class="btn-main" onclick="startWater()" data-key="btnCalc">Create Plan</button>
-            </div>
-        </div>
-
-        <div id="view_water" class="view-section">
-            <h2 style="text-align:center; margin-bottom:30px;" data-key="hWaterTrack">Hydration</h2>
-            <div class="water-ring">
-                <svg><circle class="track" cx="100" cy="100" r="90"></circle><circle class="fill" id="w_ring" cx="100" cy="100" r="90"></circle></svg>
-                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
-                    <div id="w_timer" style="font-size:2rem; font-weight:800;">00:00</div>
-                    <div style="font-size:0.8rem; opacity:0.7;" data-key="lblNextSip">Next Sip</div>
-                </div>
-            </div>
-            
-            <div class="mobile-stack" style="margin-bottom:25px;">
-                <div class="card" style="text-align:center; margin:0; padding:15px; flex:1;">
-                    <i class="fas fa-glass-water" style="font-size:1.5rem; color:#0ea5e9;"></i>
-                    <div id="w_drunk" style="font-size:1.5rem; font-weight:700;">0</div>
-                    <div style="font-size:0.7rem;" data-key="lblDrunk">DRUNK</div>
-                </div>
-                <div class="card" style="text-align:center; margin:0; padding:15px; flex:1;">
-                    <i class="fas fa-bullseye" style="font-size:1.5rem; color:var(--accent);"></i>
-                    <div id="w_goal" style="font-size:1.5rem; font-weight:700;">0L</div>
-                    <div style="font-size:0.7rem;" data-key="lblGoal">GOAL</div>
-                </div>
-            </div>
-            
-            <button class="btn-main" onclick="addWater()" data-key="btnDrink">Drink (250ml)</button>
-        </div>
-
-        <div id="view_meds" class="view-section">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="margin:0;" data-key="hMeds">Medications</h2>
-                <button onclick="openMedForm()" class="btn-main" style="width:44px; height:44px; padding:0; border-radius:14px;"><i class="fas fa-plus"></i></button>
-            </div>
-            <div id="med_list"></div>
-        </div>
-
-        <div id="view_med_form" class="view-section">
-            <h2 id="form_title" data-key="hAddMed">Add Medication</h2>
-            <input type="hidden" id="m_edit_id">
-            <div class="card">
-                <div class="form-group">
-                    <label data-key="lblMedName">Name</label>
-                    <input type="text" id="m_name" class="input-box" data-key-ph="phMedName" placeholder="e.g. Aspirin">
-                </div>
-                <div class="form-group">
-                    <label data-key="lblFreq">Frequency</label>
-                    <div style="display:flex; gap:10px;">
-                        <button class="input-box dose-btn active" onclick="setDose(1)" style="text-align:center;">1x</button>
-                        <button class="input-box dose-btn" onclick="setDose(2)" style="text-align:center;">2x</button>
-                        <button class="input-box dose-btn" onclick="setDose(3)" style="text-align:center;">3x</button>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label data-key="lblSetTime">Time(s)</label>
-                    <div id="time_con" class="wrap-container">
-                        <input type="time" class="input-box time-inp">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label data-key="lblRepeat">Days</label>
-                    <div class="day-selector">
-                        <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="0">S</button>
-                        <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="1">M</button>
-                        <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="2">T</button>
-                        <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="3">W</button>
-                        <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="4">T</button>
-                        <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="5">F</button>
-                        <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="6">S</button>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label data-key="lblNote">Note</label>
-                    <input type="text" id="m_note" class="input-box" data-key-ph="phNote" placeholder="Instructions...">
-                </div>
-                
-                <div class="mobile-stack">
-                    <button class="btn-main btn-sec" onclick="nav('meds')" data-key="btnCancel">Cancel</button>
-                    <button class="btn-main" onclick="saveMed()" data-key="btnSave">Save</button>
-                </div>
-            </div>
-        </div>
-
+    <div id="loadingView" class="glass-card" style="text-align:center;">
+        <div class="loader"></div>
+        <h2>Setting up...</h2>
+        <p class="sub">Personalizing interface</p>
     </div>
 
-    <div id="nav_bar" class="nav-bar" style="display:none;">
-        <button class="nav-btn active" onclick="nav('water')" id="nav_water">
-            <i class="fas fa-glass-water"></i><span data-key="navWater">Water</span>
-        </button>
-        <button class="nav-btn" onclick="nav('meds')" id="nav_meds">
-            <i class="fas fa-pills"></i><span data-key="navMeds">Meds</span>
-        </button>
+    <div id="appView" class="glass-card">
+        <div class="app-header">
+            <div class="user-info">
+                <img src="" id="appUserImg" class="user-avatar" style="display:none;">
+                <div id="defaultAvatar" class="user-avatar" style="display:flex;align-items:center;justify-content:center;background:var(--primary);color:white;">?</div>
+                <div>
+                    <div style="font-size:0.8rem; opacity:0.7;">Welcome back,</div>
+                    <div style="font-weight:700; font-size:1.1rem;" id="appNameDisplay">User</div>
+                </div>
+            </div>
+            <div style="text-align:right;">
+                <div id="clockDisplay" style="font-weight:700;">00:00</div>
+                <div style="font-size:0.7rem; opacity:0.7;">Current Time</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('water')" id="tabWater">💧 Water</button>
+            <button class="tab" onclick="switchTab('med')" id="tabMed">💊 Medicine</button>
+        </div>
+
+        <div id="contentWater">
+            <div id="waterSetup">
+                <p class="sub">Set daily hydration goal</p>
+                <label>Weight (kg)</label>
+                <input type="number" id="w_weight" placeholder="e.g. 70">
+                <div class="time-grid">
+                    <div>
+                        <label>Active Hours</label>
+                        <select id="w_hours">
+                            <option value="8">8 Hours</option>
+                            <option value="12">12 Hours</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Interval</label>
+                        <select id="w_interval">
+                            <option value="2">2 Min (Test)</option>
+                            <option value="30">30 Min</option>
+                            <option value="60">1 Hour</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-liquid" style="--primary:#0ea5e9;" onclick="WaterApp.start()">Start Tracking</button>
+            </div>
+
+            <div id="waterActive" class="hidden">
+                <div class="water-ring">
+                    <svg><circle class="ring-bg"></circle><circle class="ring-val" id="w_ring"></circle></svg>
+                    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+                        <div id="w_timer" style="font-size:1.5rem; font-weight:700;">00:00</div>
+                        <div style="font-size:0.7rem; opacity:0.7;">Next Sip</div>
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; text-align:center; margin-bottom:20px;">
+                    <div style="background:var(--input-bg); padding:10px 20px; border-radius:15px; flex:1; margin-right:10px;">
+                        <div style="font-size:1.2rem; font-weight:700;" id="w_count">0</div>
+                        <div style="font-size:0.7rem;">Glasses</div>
+                    </div>
+                    <div style="background:var(--input-bg); padding:10px 20px; border-radius:15px; flex:1; margin-left:10px;">
+                        <div style="font-size:1.2rem; font-weight:700;" id="w_goal">0L</div>
+                        <div style="font-size:0.7rem;">Goal</div>
+                    </div>
+                </div>
+                <button class="btn-liquid" style="background: linear-gradient(90deg, #0ea5e9, #6366f1);" onclick="WaterApp.drink()">🥤 Log Glass</button>
+            </div>
+        </div>
+
+        <div id="contentMed" class="hidden">
+            <p class="sub" style="margin-bottom:15px;">Medication schedule.</p>
+            
+            <label>Medicine Name</label>
+            <input type="text" id="m_name" placeholder="e.g. Aspirin">
+
+            <label>Doses per day</label>
+            <div class="freq-grid">
+                <button class="freq-btn active" onclick="MedApp.setFreq(1)">1</button>
+                <button class="freq-btn" onclick="MedApp.setFreq(2)">2</button>
+                <button class="freq-btn" onclick="MedApp.setFreq(3)">3</button>
+                <button class="freq-btn" onclick="MedApp.setFreq(4)">4</button>
+            </div>
+
+            <label>Set Times</label>
+            <div id="timeInputs" class="time-grid" style="margin-bottom:20px;">
+                <input type="time">
+            </div>
+
+            <label>Select Days</label>
+            <div class="days-wrapper" id="daySelect">
+                </div>
+            
+            <label>Message to Speak</label>
+            <input type="text" id="m_msg" placeholder="e.g. Take with warm water">
+
+            <button class="btn-liquid" style="background: linear-gradient(90deg, #ec4899, #8b5cf6);" onclick="MedApp.add()">Add Schedule</button>
+            
+            <div style="margin-top:25px; max-height:200px; overflow-y:auto;" id="medList"></div>
+        </div>
+
     </div>
 
 </div>
 
-<div class="modal-overlay" id="alert_modal">
+<div class="modal-overlay" id="alertModal">
     <div class="modal-box">
-        <i class="fas fa-bell" style="font-size:3rem; color:var(--accent); margin-bottom:15px;"></i>
-        <h2 id="alert_t">Alert</h2>
-        <p id="alert_b" style="margin-bottom:20px; opacity:0.8;">Time up!</p>
-        <button class="btn-main" onclick="AudioSys.stop()">Dismiss</button>
-    </div>
-</div>
-
-<div class="modal-overlay" id="win_modal">
-    <div class="modal-box">
-        <i class="fas fa-trophy" style="font-size:3rem; color:var(--success); margin-bottom:15px;"></i>
-        <h2>Goal Reached!</h2>
-        <p style="margin-bottom:20px; opacity:0.8;">You are fully hydrated!</p>
-        <button class="btn-main" onclick="document.getElementById('win_modal').style.display='none'">Awesome</button>
+        <div style="font-size:3rem; margin-bottom:10px;">⏰</div>
+        <h2 id="alertTitle">Alert</h2>
+        <p class="sub" id="alertMsg">Time to take action</p>
+        <button class="btn-liquid" onclick="AudioSys.stop()">Dismiss</button>
     </div>
 </div>
 
 <script>
-    /* --- DATA & LANGUAGE ENGINE (FIXED) --- */
-    const LangData = {
-        en: { appTitle: "HealthHub", appSub: "Wellness Companion", welcome: "Welcome", lblName: "Your Name", phName: "John Doe", lblDob: "Date of Birth", lblAge: "Age", lblLang: "Language", btnStart: "Start Journey", hWaterSetup: "Hydration Plan", subWaterSetup: "Set your daily goal.", lblWeight: "Weight (KG)", lblWake: "Wake Up", lblBed: "Bed Time", lblInterval: "Interval", btnCalc: "Create Plan", hWaterTrack: "Hydration", lblNextSip: "Next Sip", lblDrunk: "DRUNK", lblGoal: "GOAL", btnDrink: "Drink (250ml)", hMeds: "Medications", hAddMed: "Add Medication", hEditMed: "Edit Medication", lblMedName: "Name", phMedName: "e.g. Aspirin", lblFreq: "Frequency", lblSetTime: "Time(s)", lblRepeat: "Days", lblNote: "Note", phNote: "Instructions...", btnCancel: "Cancel", btnSave: "Save", navWater: "Water", navMeds: "Meds", noMeds: "No medications set.", alertTitle: "Alert" },
-        hi: { appTitle: "हेल्थहब", appSub: "आपका स्वास्थ्य साथी", welcome: "स्वागत है", lblName: "नाम", phName: "नाम दर्ज करें", lblDob: "जन्म तिथि", lblAge: "आयु", lblLang: "भाषा", btnStart: "शुरू करें", hWaterSetup: "हाइड्रेशन योजना", subWaterSetup: "लक्ष्य निर्धारित करें", lblWeight: "वजन (किलो)", lblWake: "जागना", lblBed: "सोना", lblInterval: "अंतराल", btnCalc: "प्लान बनाएं", hWaterTrack: "हाइड्रेशन", lblNextSip: "अगला घूँट", lblDrunk: "पी लिया", lblGoal: "लक्ष्य", btnDrink: "पानी पिएं", hMeds: "दवाइयाँ", hAddMed: "दवा जोड़ें", hEditMed: "दवा बदलें", lblMedName: "दवा का नाम", phMedName: "जैसे एस्पिरिन", lblFreq: "आवृत्ति", lblSetTime: "समय", lblRepeat: "दिन", lblNote: "नोट", phNote: "निर्देश...", btnCancel: "रद्द", btnSave: "सहेजें", navWater: "पानी", navMeds: "दवा", noMeds: "कोई दवा नहीं", alertTitle: "चेतावनी" },
-        gu: { appTitle: "હેલ્થહબ", appSub: "સ્વાસ્થ્ય સાથી", welcome: "સ્વાગત", lblName: "નામ", phName: "નામ લખો", lblDob: "જન્મ તારીખ", lblAge: "ઉંમર", lblLang: "ભાષા", btnStart: "શરૂ કરો", hWaterSetup: "હાઇડ્રેશન પ્લાન", subWaterSetup: "લક્ષ્ય નક્કી કરો", lblWeight: "વજન (કિલો)", lblWake: "જાગવું", lblBed: "સૂવું", lblInterval: "અંતરાલ", btnCalc: "પ્લાન બનાવો", hWaterTrack: "હાઇડ્રેશન", lblNextSip: "આગળનો ઘૂંટડો", lblDrunk: "પીધું", lblGoal: "લક્ષ્ય", btnDrink: "પાણી પીવો", hMeds: "દવાઓ", hAddMed: "દવા ઉમેરો", hEditMed: "દવા બદલો", lblMedName: "દવાનું નામ", phMedName: "જેમ કે એસ્પિરિન", lblFreq: "આવર્તન", lblSetTime: "સમય", lblRepeat: "દિવસો", lblNote: "નોંધ", phNote: "સૂચના...", btnCancel: "રદ", btnSave: "સાચવો", navWater: "પાણી", navMeds: "દવા", noMeds: "કોઈ દવા નથી", alertTitle: "ચેતવણી" }
-    };
-    let lang = 'en';
-
-    function changeLang(l) {
-        lang = l;
-        const data = LangData[l];
-        // Instant Text Update
-        document.querySelectorAll('[data-key]').forEach(el => {
-            if(data[el.dataset.key]) el.innerText = data[el.dataset.key];
-        });
-        // Instant Placeholder Update
-        document.querySelectorAll('[data-key-ph]').forEach(el => {
-            if(data[el.dataset.keyPh]) el.placeholder = data[el.dataset.keyPh];
-        });
+    /* --- 0. THEME & UTILS --- */
+    function toggleTheme() {
+        const b = document.body;
+        b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
+    
+    // Generate Day Pills
+    const days = ['M','T','W','T','F','S','S'];
+    const dayCon = document.getElementById('daySelect');
+    days.forEach((d,i) => {
+        const pill = document.createElement('div');
+        pill.className = 'day-pill';
+        pill.innerText = d;
+        pill.dataset.value = i === 6 ? 0 : i + 1; // 0=Sun, 1=Mon
+        pill.onclick = function() {
+            this.classList.toggle('selected');
+        }
+        dayCon.appendChild(pill);
+    });
 
-    /* --- AUDIO SYSTEM --- */
+    /* --- 1. AUDIO SYSTEM + TTS --- */
     const AudioSys = {
         ctx: null, interval: null,
-        init: () => {
-            if(!AudioSys.ctx) AudioSys.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        init: () => { if(!AudioSys.ctx) AudioSys.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+        playTone: () => {
+            if(!AudioSys.ctx) AudioSys.init();
             if(AudioSys.ctx.state === 'suspended') AudioSys.ctx.resume();
-            const o=AudioSys.ctx.createOscillator(); const g=AudioSys.ctx.createGain();
-            o.connect(g); g.connect(AudioSys.ctx.destination);
-            g.gain.value=0.0001; o.start(); o.stop(0.1); // Silent unlock
+            const osc = AudioSys.ctx.createOscillator();
+            const gain = AudioSys.ctx.createGain();
+            osc.connect(gain); gain.connect(AudioSys.ctx.destination);
+            osc.type = 'sine'; osc.frequency.value = 600;
+            gain.gain.setValueAtTime(0.5, AudioSys.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, AudioSys.ctx.currentTime + 0.5);
+            osc.start(); osc.stop(AudioSys.ctx.currentTime + 0.5);
         },
-        tone: () => {
-            if(AudioSys.ctx.state === 'suspended') AudioSys.ctx.resume();
-            const o=AudioSys.ctx.createOscillator(); const g=AudioSys.ctx.createGain();
-            o.connect(g); g.connect(AudioSys.ctx.destination);
-            o.frequency.setValueAtTime(600, AudioSys.ctx.currentTime);
-            g.gain.setValueAtTime(0.5, AudioSys.ctx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.001, AudioSys.ctx.currentTime+0.5);
-            o.start(); o.stop(AudioSys.ctx.currentTime+0.5);
+        speak: (text) => {
+            if('speechSynthesis' in window) {
+                const utter = new SpeechSynthesisUtterance(text);
+                window.speechSynthesis.speak(utter);
+            }
         },
-        speak: (txt) => {
-            window.speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(txt);
-            const v = window.speechSynthesis.getVoices().find(vo => vo.lang.startsWith(lang));
-            if(v) u.voice = v;
-            u.lang = lang; window.speechSynthesis.speak(u);
+        trigger: (title, msg, speakText) => {
+            document.getElementById('alertModal').style.display = 'flex';
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMsg').innerText = msg;
+            
+            const action = () => {
+                AudioSys.playTone();
+                if(speakText) AudioSys.speak(speakText);
+                if(navigator.vibrate) navigator.vibrate([400, 200, 400]);
+            };
+            action();
+            AudioSys.interval = setInterval(action, 4000); // Repeat every 4s to allow speech to finish
         },
-        trigger: (t, b, s) => {
-            document.getElementById('alert_modal').style.display='flex';
-            document.getElementById('alert_t').innerText = t;
-            document.getElementById('alert_b').innerText = b;
-            const act = () => { AudioSys.tone(); if(s) AudioSys.speak(s); if(navigator.vibrate) navigator.vibrate([500,200,500]); };
-            act();
-            AudioSys.interval = setInterval(act, 4000);
-            if('Notification' in window && Notification.permission==='granted') new Notification(t,{body:b});
-        },
-        stop: () => { clearInterval(AudioSys.interval); window.speechSynthesis.cancel(); document.getElementById('alert_modal').style.display='none'; }
+        stop: () => {
+            clearInterval(AudioSys.interval);
+            if(window.speechSynthesis) window.speechSynthesis.cancel();
+            document.getElementById('alertModal').style.display = 'none';
+        }
     };
-    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 
-    /* --- LOGIC --- */
-    function toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme')==='dark'?'light':'dark'); }
-    function showView(id) { document.querySelectorAll('.view-section').forEach(v=>v.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-    function nav(loc) { 
-        document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); 
-        document.getElementById('nav_'+loc).classList.add('active');
-        loc==='water' ? (water.goal>0 ? showView('view_water') : showView('view_water_setup')) : showView('view_meds');
-    }
-    
-    function loadImg(e) { const r=new FileReader(); r.onload=ev=>{document.getElementById('img_preview').src=ev.target.result; document.getElementById('img_preview').style.display='block'; document.getElementById('cam_icon').style.display='none'; document.getElementById('head_avatar').src=ev.target.result;}; r.readAsDataURL(e.target.files[0]); }
-    function calcAge() { const d=document.getElementById('u_dob').value; if(d) document.getElementById('u_age').value = Math.abs(new Date(Date.now()-new Date(d).getTime()).getUTCFullYear()-1970); }
-    
-    function doLogin() {
-        if(!document.getElementById('u_name').value) return alert("Enter Name");
-        document.getElementById('head_name').innerText = document.getElementById('u_name').value;
-        document.getElementById('header_bar').style.display='flex';
-        document.getElementById('nav_bar').style.display='flex';
-        AudioSys.init(); if('Notification' in window) Notification.requestPermission();
-        nav('water');
-    }
-
-    /* Water */
-    let water = {t:null, left:0, max:0, goal:0, cnt:0};
-    function startWater() {
-        const w=document.getElementById('w_weight').value;
-        if(!w) return alert("Weight?");
-        water.goal = Math.ceil((w*0.033*1000)/250);
-        document.getElementById('w_goal').innerText = (w*0.033).toFixed(1)+'L';
-        water.max = parseInt(document.getElementById('w_int').value)*60;
-        water.left = water.max;
-        showView('view_water'); runWater();
-    }
-    function runWater() {
-        clearInterval(water.t); drawWater();
-        water.t = setInterval(() => { water.left--; drawWater(); if(water.left<=0) { clearInterval(water.t); AudioSys.trigger(LangData[lang].alertTitle, "Drink Water!", "Drink Water"); } }, 1000);
-    }
-    function drawWater() {
-        document.getElementById('w_timer').innerText = Math.floor(water.left/60).toString().padStart(2,'0')+":"+(water.left%60).toString().padStart(2,'0');
-        document.getElementById('w_ring').style.strokeDashoffset = 565 - (565 * (water.left/water.max));
-    }
-    function addWater() { water.cnt++; document.getElementById('w_drunk').innerText=water.cnt; if(water.cnt>=water.goal) document.getElementById('win_modal').style.display='flex'; AudioSys.stop(); water.left=water.max; runWater(); }
-
-    /* Meds */
-    let meds = [];
-    function setDose(n) {
-        document.querySelectorAll('.dose-btn').forEach((b,i)=>b.classList.toggle('active', i+1===n));
-        const c=document.getElementById('time_con'); c.innerHTML='';
-        for(let i=0;i<n;i++) c.innerHTML+=`<input type="time" class="input-box time-inp" style="min-width:100px;">`;
-    }
-    
-    function openMedForm(id=null) {
-        document.getElementById('form_title').innerText = id ? LangData[lang].hEditMed : LangData[lang].hAddMed;
-        document.getElementById('m_edit_id').value = id || '';
-        if(id) {
-            const m = meds.find(x=>x.id===id);
-            document.getElementById('m_name').value = m.name;
-            document.getElementById('m_note').value = m.note;
-            setDose(m.times.length);
-            setTimeout(() => { const inps=document.querySelectorAll('.time-inp'); m.times.forEach((t,i)=>inps[i].value=t); }, 50);
-            document.querySelectorAll('.day-btn').forEach(b=>b.classList.toggle('active', m.days.includes(parseInt(b.dataset.d))));
-        } else {
-            document.getElementById('m_name').value=''; document.getElementById('m_note').value='';
-            setDose(1); document.querySelectorAll('.day-btn').forEach(b=>b.classList.add('active'));
+    /* --- 2. IMAGE UPLOAD --- */
+    function handleImageUpload(e) {
+        const file = e.target.files[0];
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('previewImg').style.display = 'block';
+                document.querySelector('.profile-upload i').style.display = 'none';
+                document.getElementById('appUserImg').src = e.target.result;
+                document.getElementById('appUserImg').style.display = 'block';
+                document.getElementById('defaultAvatar').style.display = 'none';
+            }
+            reader.readAsDataURL(file);
         }
-        showView('view_med_form');
     }
-    
-    function saveMed() {
-        const name=document.getElementById('m_name').value;
-        const times=Array.from(document.querySelectorAll('.time-inp')).map(i=>i.value).filter(v=>v);
-        const days=Array.from(document.querySelectorAll('.day-btn.active')).map(b=>parseInt(b.dataset.d));
-        const id=document.getElementById('m_edit_id').value;
-        if(!name || !times.length) return alert("Fill Details");
-        if(id) meds = meds.filter(m=>m.id!=id);
-        meds.push({id:Date.now(), name, times, days, note:document.getElementById('m_note').value});
-        renderMeds(); nav('meds');
-    }
-    
-    function renderMeds() {
-        const c=document.getElementById('med_list');
-        if(!meds.length) c.innerHTML = `<p style="text-align:center; opacity:0.6; margin-top:30px;">${LangData[lang].noMeds}</p>`;
-        else c.innerHTML = meds.map(m => `
-            <div class="med-item">
-                <div style="display:flex; align-items:center;">
-                    <i class="fas fa-pills" style="font-size:1.5rem; color:var(--accent); margin-right:15px;"></i>
-                    <div><div style="font-weight:700;">${m.name}</div><div style="font-size:0.8rem; opacity:0.8;">${m.times.join(', ')}</div></div>
-                </div>
-                <div class="med-actions">
-                    <button onclick="openMedForm(${m.id})"><i class="fas fa-pencil"></i></button>
-                    <button onclick="deleteMed(${m.id})" style="color:#ef4444;"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>`).join('');
-    }
-    function deleteMed(id) { meds=meds.filter(m=>m.id!==id); renderMeds(); }
 
-    /* Checker */
-    setInterval(() => {
-        const d = new Date();
-        if(d.getSeconds()===0) {
-            const t = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false});
-            const dy = d.getDay();
-            meds.forEach(m => {
-                if(m.days.includes(dy) && m.times.includes(t)) AudioSys.trigger(LangData[lang].alertTitle, `Take ${m.name}`, m.note||m.name);
-            });
+    /* --- 3. LOGIN LOGIC --- */
+    function handleLogin() {
+        const name = document.getElementById('u_name').value;
+        if(!name) return alert("Please enter your name");
+        document.getElementById('appNameDisplay').innerText = name;
+        document.getElementById('loginView').classList.remove('active');
+        document.getElementById('loadingView').classList.add('active');
+        setTimeout(() => {
+            document.getElementById('loadingView').classList.remove('active');
+            document.getElementById('appView').classList.add('active');
+            AudioSys.init();
+            WaterApp.initClock();
+            MedApp.startClock();
+        }, 2000);
+    }
+
+    /* --- 4. TABS --- */
+    function switchTab(t) {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.getElementById(t === 'water' ? 'tabWater' : 'tabMed').classList.add('active');
+        document.getElementById('contentWater').className = t === 'water' ? '' : 'hidden';
+        document.getElementById('contentMed').className = t === 'med' ? '' : 'hidden';
+    }
+
+    /* --- 5. WATER APP --- */
+    const WaterApp = {
+        timer: null, max: 0, cur: 0, timeLeft: 0, totalTime: 0,
+        initClock: () => {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('clockDisplay').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }, 1000);
+        },
+        start: () => {
+            const w = document.getElementById('w_weight').value;
+            const int = document.getElementById('w_interval').value;
+            if(!w) return alert("Enter weight");
+            WaterApp.max = Math.ceil((w * 0.033 * 1000) / 250);
+            document.getElementById('w_goal').innerText = (w * 0.033).toFixed(1) + 'L';
+            WaterApp.totalTime = int * 60;
+            document.getElementById('waterSetup').classList.add('hidden');
+            document.getElementById('waterActive').classList.remove('hidden');
+            WaterApp.resetTimer();
+        },
+        resetTimer: () => {
+            clearInterval(WaterApp.timer);
+            WaterApp.timeLeft = WaterApp.totalTime;
+            WaterApp.updateRing();
+            WaterApp.timer = setInterval(() => {
+                WaterApp.timeLeft--;
+                WaterApp.updateRing();
+                if(WaterApp.timeLeft <= 0) {
+                    clearInterval(WaterApp.timer);
+                    AudioSys.trigger("Hydrate!", "Time to drink water", "It is time to drink water");
+                }
+            }, 1000);
+        },
+        updateRing: () => {
+            const min = Math.floor(WaterApp.timeLeft / 60).toString().padStart(2,'0');
+            const sec = (WaterApp.timeLeft % 60).toString().padStart(2,'0');
+            document.getElementById('w_timer').innerText = `${min}:${sec}`;
+            const offset = 440 - (440 * (WaterApp.timeLeft / WaterApp.totalTime));
+            document.getElementById('w_ring').style.strokeDashoffset = offset;
+        },
+        drink: () => {
+            WaterApp.cur++;
+            document.getElementById('w_count').innerText = WaterApp.cur;
+            AudioSys.stop();
+            if(WaterApp.cur >= WaterApp.max) { alert("Goal Reached!"); clearInterval(WaterApp.timer); } else { WaterApp.resetTimer(); }
         }
-    }, 1000);
-    setDose(1);
+    };
+
+    /* --- 6. MED APP --- */
+    const MedApp = {
+        items: [],
+        setFreq: (n) => {
+            document.querySelectorAll('.freq-btn').forEach((b, i) => b.classList.toggle('active', i+1 === n));
+            const con = document.getElementById('timeInputs');
+            con.innerHTML = '';
+            for(let i=0; i<n; i++) {
+                const inp = document.createElement('input'); inp.type = 'time'; con.appendChild(inp);
+            }
+        },
+        add: () => {
+            const name = document.getElementById('m_name').value;
+            const msg = document.getElementById('m_msg').value || `Take ${name}`; // Get speech text
+            const times = Array.from(document.querySelectorAll('#timeInputs input')).map(i => i.value).filter(v => v);
+            const days = Array.from(document.querySelectorAll('.day-pill.selected')).map(c => c.dataset.value);
+            
+            if(!name || times.length === 0 || days.length === 0) return alert("Fill all details");
+            
+            MedApp.items.push({ id: Date.now(), name, times, days, msg });
+            MedApp.render();
+            document.getElementById('m_name').value = '';
+            document.getElementById('m_msg').value = '';
+            MedApp.setFreq(1);
+            document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('selected'));
+        },
+        render: () => {
+            const list = document.getElementById('medList');
+            list.innerHTML = MedApp.items.map(item => `
+                <div class="med-item">
+                    <div>
+                        <div style="font-weight:700;">${item.name}</div>
+                        <div style="font-size:0.8rem; opacity:0.7;">${item.times.join(', ')}</div>
+                    </div>
+                    <button onclick="MedApp.del(${item.id})" style="border:none; background:none; color:red; font-size:1.2rem;">×</button>
+                </div>
+            `).join('');
+        },
+        del: (id) => { MedApp.items = MedApp.items.filter(i => i.id !== id); MedApp.render(); },
+        startClock: () => {
+            setInterval(() => {
+                const now = new Date();
+                if(now.getSeconds() === 0) {
+                    const tStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
+                    const dStr = String(now.getDay());
+                    MedApp.items.forEach(item => {
+                        if(item.days.includes(dStr) && item.times.includes(tStr)) {
+                            // Trigger with custom speech message
+                            AudioSys.trigger("Medicine Time", `Take ${item.name}`, item.msg);
+                        }
+                    });
+                }
+            }, 1000);
+        }
+    };
+    
+    // Init
+    MedApp.setFreq(1);
 </script>
 </body>
 </html>
