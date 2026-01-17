@@ -6,203 +6,187 @@
 <meta name="theme-color" content="#4f46e5">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>HealthHub Pro | Ultimate</title>
+<title>HealthHub Pro | Gold</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
 <style>
     :root {
-        /* --- LIGHT THEME VARIABLES --- */
+        /* LIGHT THEME */
         --primary: #6366f1;
-        --primary-dark: #4f46e5;
         --accent: #ec4899;
-        
-        /* Backgrounds */
-        --bg-body: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-        --glass-bg: rgba(255, 255, 255, 0.85);
-        --glass-border: rgba(255, 255, 255, 0.9);
+        --bg-body: #f8fafc;
         --surface: #ffffff;
-        --input-bg: #f3f4f6;
-        
-        /* Text */
-        --text-main: #1f2937;
-        --text-sub: #6b7280;
-        
-        /* UI Accents */
-        --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-        --nav-bg: rgba(255, 255, 255, 0.9);
+        --text-main: #0f172a;
+        --text-sub: #64748b;
+        --input-bg: #f1f5f9;
+        --input-border: #e2e8f0;
+        --shadow: 0 4px 20px rgba(0,0,0,0.05);
     }
 
     [data-theme="dark"] {
-        /* --- DARK THEME VARIABLES --- */
-        --bg-body: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); /* Deep Galaxy */
-        --glass-bg: rgba(15, 23, 42, 0.85);
-        --glass-border: rgba(255, 255, 255, 0.1);
+        /* DARK THEME */
+        --bg-body: #0f172a;
         --surface: #1e293b;
-        --input-bg: #334155;
-        
-        /* Text */
         --text-main: #f8fafc;
         --text-sub: #94a3b8;
-        
-        /* UI Accents */
-        --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-        --nav-bg: rgba(15, 23, 42, 0.9);
+        --input-bg: #334155;
+        --input-border: #475569;
+        --shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
 
-    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
 
     body {
         margin: 0;
         font-family: 'Plus Jakarta Sans', sans-serif;
         background: var(--bg-body);
         color: var(--text-main);
-        height: 100dvh;
-        overflow: hidden;
+        height: 100dvh; /* Mobile Viewport Fix */
         display: flex;
         justify-content: center;
-        align-items: center;
-        transition: background 0.5s ease;
+        overflow: hidden;
+        transition: background 0.3s ease;
     }
 
-    /* --- RESPONSIVE CONTAINER --- */
-    .app-frame {
+    /* --- LAYOUT CONTAINER --- */
+    .app-shell {
         width: 100%;
         height: 100%;
-        position: relative;
+        background: var(--surface);
         display: flex;
         flex-direction: column;
+        position: relative;
         overflow: hidden;
-        background: var(--glass-bg);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        transition: 0.3s;
     }
 
     @media (min-width: 768px) {
-        .app-frame {
-            width: 420px;
+        body { align-items: center; padding: 20px; }
+        .app-shell {
+            width: 400px;
             height: 90vh;
             max-height: 850px;
-            border-radius: 40px;
+            border-radius: 32px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--glass-border);
+            border: 1px solid var(--input-border);
         }
     }
 
     /* --- HEADER --- */
-    .app-header {
-        padding: 20px 24px;
-        padding-top: max(20px, env(safe-area-inset-top));
+    .header {
+        padding: 16px 24px;
+        padding-top: max(16px, env(safe-area-inset-top));
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: transparent;
+        background: var(--surface);
+        border-bottom: 1px solid var(--input-border);
         z-index: 20;
     }
-    
-    .profile-pill {
-        display: flex; align-items: center; gap: 12px;
-        background: var(--surface); padding: 6px 14px 6px 6px;
-        border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    .user-pill { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: var(--input-bg); border: 2px solid var(--primary); }
+    .user-name { font-weight: 700; font-size: 1rem; }
+    .theme-toggle {
+        width: 40px; height: 40px; border-radius: 12px;
+        background: var(--input-bg); border: none;
+        color: var(--text-main); display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 1.2rem; transition: 0.2s;
     }
-    .avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
-    .user-name { font-weight: 700; font-size: 0.95rem; }
 
-    .header-actions { display: flex; gap: 8px; }
-    .action-btn {
-        width: 40px; height: 40px; border-radius: 50%;
-        background: var(--surface); border: none;
-        color: var(--text-main); font-size: 1.1rem;
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        transition: 0.2s;
-    }
-    .action-btn:active { transform: scale(0.9); }
-
-    /* --- CONTENT SCROLL --- */
-    .scroll-view {
+    /* --- CONTENT AREA --- */
+    .content {
         flex: 1;
         overflow-y: auto;
         padding: 24px;
         padding-bottom: 120px;
+        scroll-behavior: smooth;
     }
-    .scroll-view::-webkit-scrollbar { display: none; }
-
-    /* --- CARDS & INPUTS --- */
-    .card {
-        background: var(--surface);
-        border-radius: 24px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    
+    /* --- INPUTS & FORMS (FIXED LAYOUT) --- */
+    .input-group { margin-bottom: 20px; }
+    
+    label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-sub);
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
     }
 
-    h1 { font-size: 1.8rem; font-weight: 800; margin: 0 0 10px; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    h2 { font-size: 1.25rem; font-weight: 700; margin: 0 0 15px; color: var(--text-main); }
-    label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-sub); margin-bottom: 8px; display: block; letter-spacing: 0.5px; }
-
-    .input-field {
-        width: 100%; padding: 16px;
-        border-radius: 16px; border: 1px solid transparent;
-        background: var(--input-bg); color: var(--text-main);
-        font-size: 1rem; margin-bottom: 20px; transition: 0.2s;
+    .input-box {
+        width: 100%;
+        padding: 16px;
+        border-radius: 16px;
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--text-main); /* Ensures text is visible */
         font-family: inherit;
+        font-size: 1rem;
+        transition: 0.2s;
+        -webkit-appearance: none; /* iOS Reset */
     }
-    .input-field:focus { background: var(--surface); border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); }
+    .input-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); background: var(--surface); }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    /* Stacked Layout specifically to prevent overlap */
+    .row-stack {
+        display: flex;
+        gap: 15px;
+    }
+    .row-stack > div { flex: 1; }
 
     /* --- BUTTONS --- */
-    .btn-main {
-        width: 100%; padding: 18px; border-radius: 18px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white; font-size: 1rem; font-weight: 700; border: none;
-        cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
-        box-shadow: 0 10px 20px -8px var(--primary);
+    .btn-primary {
+        width: 100%;
+        padding: 18px;
+        border-radius: 18px;
+        border: none;
+        background: linear-gradient(135deg, var(--primary), #4f46e5);
+        color: white;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        box-shadow: 0 8px 20px -6px var(--primary);
+        transition: transform 0.1s;
     }
-    .btn-main:active { transform: scale(0.97); }
+    .btn-primary:active { transform: scale(0.98); }
     
-    .btn-sec { background: transparent; border: 1px solid var(--text-sub); color: var(--text-sub); box-shadow: none; }
+    .btn-sec { background: transparent; border: 1px solid var(--input-border); color: var(--text-sub); box-shadow: none; }
 
-    /* --- MEDICINE ITEM --- */
-    .med-item {
+    /* --- MEDICATION LIST --- */
+    .med-card {
         background: var(--surface);
-        padding: 16px; border-radius: 20px;
+        border: 1px solid var(--input-border);
+        padding: 16px;
+        border-radius: 20px;
         margin-bottom: 12px;
         display: flex; justify-content: space-between; align-items: center;
-        border: 1px solid rgba(0,0,0,0.05);
-        transition: 0.2s;
+        box-shadow: var(--shadow);
     }
-    .med-item:active { transform: scale(0.98); background: var(--input-bg); }
-    
-    .med-left { display: flex; align-items: center; gap: 15px; }
     .med-icon {
-        width: 46px; height: 46px; border-radius: 14px;
-        background: rgba(236, 72, 153, 0.1); color: var(--accent);
-        display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        width: 48px; height: 48px; border-radius: 14px;
+        background: rgba(99, 102, 241, 0.1); color: var(--primary);
+        display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+        margin-right: 15px;
     }
-    .med-actions { display: flex; gap: 10px; }
-    .icon-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--input-bg); color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-    /* --- WATER RING --- */
-    .water-ring { position: relative; width: 180px; height: 180px; margin: 0 auto 30px; }
-    svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-    circle { fill: none; stroke-width: 16; stroke-linecap: round; }
-    .track { stroke: var(--input-bg); }
-    .fill { stroke: #0ea5e9; stroke-dasharray: 500; stroke-dashoffset: 500; transition: 1s ease; }
-    .ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+    .action-btn {
+        width: 36px; height: 36px; border-radius: 10px;
+        background: var(--input-bg); border: none;
+        color: var(--text-sub); display: flex; align-items: center; justify-content: center;
+        cursor: pointer; margin-left: 8px;
+    }
 
     /* --- BOTTOM NAV --- */
     .nav-bar {
         position: absolute; bottom: 0; left: 0; right: 0;
-        background: var(--nav-bg);
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        padding: 15px 30px;
-        padding-bottom: max(15px, env(safe-area-inset-bottom));
+        background: var(--surface);
+        border-top: 1px solid var(--input-border);
+        padding: 12px 24px;
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
         display: flex; justify-content: space-around;
-        border-top: 1px solid rgba(0,0,0,0.05);
         z-index: 50;
     }
     .nav-btn {
@@ -210,172 +194,193 @@
         display: flex; flex-direction: column; align-items: center; gap: 4px;
         color: var(--text-sub); opacity: 0.5; transition: 0.2s; cursor: pointer; flex: 1;
     }
-    .nav-btn.active { opacity: 1; color: var(--primary); transform: translateY(-4px); }
+    .nav-btn.active { opacity: 1; color: var(--primary); transform: translateY(-2px); }
     .nav-btn i { font-size: 1.5rem; }
+    .nav-btn span { font-size: 0.7rem; font-weight: 700; }
 
-    /* --- HELPERS --- */
-    .view-section { display: none; animation: fadeUp 0.4s ease; }
+    /* --- UTILS --- */
+    .hidden { display: none; }
+    .view-section { display: none; animation: fadeUp 0.3s ease-out; }
     .view-section.active { display: block; }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 
-    /* Alert Modal */
+    /* Modal */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-    .modal-box { background: var(--surface); width: 85%; max-width: 320px; padding: 30px; border-radius: 28px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+    .modal-box { background: var(--surface); width: 85%; max-width: 320px; padding: 25px; border-radius: 24px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid var(--input-border); }
 
-    .day-selector { display: flex; gap: 5px; justify-content: space-between; margin-bottom: 20px; }
-    .day-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--text-sub); background: transparent; color: var(--text-sub); font-weight: 700; cursor: pointer; }
+    /* Day Selector */
+    .day-row { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 20px; }
+    .day-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-sub); font-weight: 700; cursor: pointer; }
     .day-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
+    /* Water Ring */
+    .water-container { position: relative; width: 180px; height: 180px; margin: 0 auto 30px; }
+    svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    circle { fill: none; stroke-width: 16; stroke-linecap: round; }
+    .track { stroke: var(--input-bg); }
+    .fill { stroke: #0ea5e9; stroke-dasharray: 500; stroke-dashoffset: 500; transition: 1s ease; }
 </style>
 </head>
 <body>
 
-<div class="app-frame">
+<div class="app-shell">
 
-    <div id="main_header" class="app-header" style="display:none;">
-        <div class="profile-pill">
+    <div id="header_bar" class="header" style="display:none;">
+        <div class="user-pill">
             <img id="head_avatar" src="" class="avatar">
-            <div class="user-name" id="head_name">User</div>
+            <div>
+                <div style="font-size:0.75rem; color:var(--text-sub);">Hello,</div>
+                <div class="user-name" id="head_name">User</div>
+            </div>
         </div>
-        <div class="header-actions">
-            <button class="action-btn" onclick="toggleTheme()" id="theme_icon"><i class="fas fa-moon"></i></button>
-        </div>
+        <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
     </div>
 
-    <div class="scroll-view">
+    <div class="content">
 
         <div id="view_login" class="view-section active">
             <div style="text-align:center; padding: 30px 0;">
-                <div style="width:70px; height:70px; background:var(--surface); border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 20px; color:var(--primary); box-shadow: var(--shadow);">
-                    <i class="fas fa-heart-pulse"></i>
-                </div>
-                <h1 data-i18n="appTitle">HealthHub Pro</h1>
-                <p style="color:var(--text-sub);" data-i18n="appSub">Ultimate Wellness Companion</p>
+                <h1 style="color:var(--primary); font-size:2rem; margin-bottom:5px;">HealthHub Pro</h1>
+                <p style="color:var(--text-sub);">Wellness & Audio Companion</p>
             </div>
 
-            <div class="card">
-                <label style="text-align:center; margin-bottom:15px;">Profile Photo</label>
-                <label for="u_img" style="width:90px; height:90px; border-radius:50%; background:var(--input-bg); border:2px dashed var(--text-sub); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; cursor:pointer; overflow:hidden;">
+            <div style="text-align:center; margin-bottom:20px;">
+                <label for="u_img" style="width:100px; height:100px; border-radius:50%; background:var(--input-bg); border:2px dashed var(--text-sub); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden;">
                     <img id="img_preview" style="width:100%; height:100%; object-fit:cover; display:none;">
                     <i class="fas fa-camera" id="cam_icon" style="font-size:1.5rem; color:var(--text-sub);"></i>
                 </label>
                 <input type="file" id="u_img" hidden accept="image/*" onchange="loadImg(event)">
+            </div>
 
-                <label data-i18n="lblName">Your Name</label>
-                <input type="text" id="u_name" class="input-field" placeholder="John Doe">
+            <div class="input-group">
+                <label>Your Name</label>
+                <input type="text" id="u_name" class="input-box" placeholder="John Doe">
+            </div>
 
-                <div class="grid-2">
-                    <div>
-                        <label data-i18n="lblDob">DOB</label>
-                        <input type="date" id="u_dob" class="input-field" onchange="calcAge()">
-                    </div>
-                    <div>
-                        <label data-i18n="lblAge">Age</label>
-                        <input type="text" id="u_age" class="input-field" readonly style="text-align:center;">
-                    </div>
+            <div class="row-stack input-group">
+                <div>
+                    <label>DOB</label>
+                    <input type="date" id="u_dob" class="input-box" onchange="calcAge()">
                 </div>
+                <div>
+                    <label>Age</label>
+                    <input type="text" id="u_age" class="input-box" readonly style="text-align:center;">
+                </div>
+            </div>
 
-                <label data-i18n="lblLang">Language</label>
+            <div class="input-group">
+                <label>Voice Language</label>
                 <div style="display:flex; gap:10px;">
-                    <select id="u_lang" class="input-field" onchange="changeLang(this.value)">
+                    <select id="u_lang" class="input-box">
                         <option value="en">English (US)</option>
                         <option value="hi">Hindi (हिंदी)</option>
                         <option value="gu">Gujarati (ગુજરાતી)</option>
                     </select>
-                    <button onclick="testAudio()" class="btn-main" style="width:auto; padding:0 15px; margin-bottom:20px;"><i class="fas fa-volume-high"></i></button>
-                </div>
-
-                <button class="btn-main" onclick="handleLogin()">
-                    <span data-i18n="btnStart">Start Journey</span> <i class="fas fa-arrow-right"></i>
-                </button>
-                
-                <div id="ios_note" style="display:none; text-align:center; margin-top:15px; font-size:0.75rem; color:#f59e0b; background:rgba(245,158,11,0.1); padding:10px; border-radius:10px;">
-                    <i class="fab fa-apple"></i> iPhone detected: Vibration is restricted by iOS on web apps. Audio alerts will still work.
+                    <button onclick="testAudio()" class="theme-toggle" style="width:54px; height:auto; border-radius:16px;"><i class="fas fa-volume-high"></i></button>
                 </div>
             </div>
+
+            <button class="btn-primary" onclick="doLogin()">Start Journey <i class="fas fa-arrow-right"></i></button>
+            
+            <p id="ios_alert" style="text-align:center; font-size:0.8rem; color:#f59e0b; margin-top:15px; display:none;">
+                <i class="fab fa-apple"></i> iOS detected: Vibration is not supported by iPhones on the web. Audio will still work.
+            </p>
         </div>
 
         <div id="view_water_setup" class="view-section">
-            <h2 data-i18n="hWaterSetup">Hydration Plan</h2>
-            <div class="card">
-                <label data-i18n="lblWeight">Weight (KG)</label>
-                <input type="number" id="w_weight" class="input-field" placeholder="70">
+            <h2 style="margin-bottom:20px;">Hydration Plan</h2>
+            
+            <div class="input-group">
+                <label>Weight (KG)</label>
+                <input type="number" id="w_weight" class="input-box" placeholder="e.g. 70">
+            </div>
 
-                <div class="grid-2">
-                    <div><label data-i18n="lblWake">Wake Up</label><input type="time" id="w_wake" class="input-field" value="07:00"></div>
-                    <div><label data-i18n="lblBed">Bed Time</label><input type="time" id="w_bed" class="input-field" value="23:00"></div>
+            <div class="row-stack input-group">
+                <div>
+                    <label>Wake Up</label>
+                    <input type="time" id="w_wake" class="input-box" value="07:00">
                 </div>
+                <div>
+                    <label>Bed Time</label>
+                    <input type="time" id="w_bed" class="input-box" value="23:00">
+                </div>
+            </div>
 
-                <label data-i18n="lblInterval">Interval</label>
-                <select id="w_int" class="input-field">
+            <div class="input-group">
+                <label>Interval</label>
+                <select id="w_int" class="input-box">
                     <option value="2">2 Mins (Demo)</option>
                     <option value="30">30 Mins</option>
                     <option value="60" selected>1 Hour</option>
                 </select>
-
-                <button class="btn-main" onclick="startWater()" data-i18n="btnCalc">Create Plan</button>
             </div>
+
+            <button class="btn-primary" onclick="startWater()">Create Plan</button>
         </div>
 
         <div id="view_water" class="view-section">
-            <div style="text-align:center; margin-bottom:20px;">
-                <h2 data-i18n="hWaterTrack">Hydration</h2>
-            </div>
+            <h2 style="text-align:center; margin-bottom:30px;">Hydration</h2>
             
-            <div class="water-ring">
+            <div class="water-container">
                 <svg><circle class="track" cx="90" cy="90" r="80"></circle><circle class="fill" id="w_ring" cx="90" cy="90" r="80"></circle></svg>
-                <div class="ring-text">
-                    <div id="w_timer" style="font-size:2rem; font-weight:800; color:var(--text-main);">00:00</div>
-                    <div style="font-size:0.8rem; color:var(--text-sub);" data-i18n="lblNextSip">Next Sip</div>
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+                    <div id="w_timer" style="font-size:2rem; font-weight:800; line-height:1;">00:00</div>
+                    <div style="font-size:0.8rem; opacity:0.7;">Next Sip</div>
                 </div>
             </div>
 
-            <div class="grid-2" style="margin-bottom:25px;">
-                <div class="card" style="text-align:center; margin:0;">
+            <div class="row-stack" style="margin-bottom:25px;">
+                <div style="background:var(--input-bg); padding:15px; border-radius:16px; text-align:center;">
                     <i class="fas fa-glass-water" style="color:#0ea5e9; font-size:1.5rem;"></i>
-                    <div id="w_drunk" style="font-size:1.5rem; font-weight:700; margin-top:5px;">0</div>
-                    <div style="font-size:0.75rem;" data-i18n="lblDrunk">Drunk</div>
+                    <div id="w_count" style="font-size:1.5rem; font-weight:700;">0</div>
+                    <div style="font-size:0.7rem; color:var(--text-sub);">DRUNK</div>
                 </div>
-                <div class="card" style="text-align:center; margin:0;">
+                <div style="background:var(--input-bg); padding:15px; border-radius:16px; text-align:center;">
                     <i class="fas fa-bullseye" style="color:var(--accent); font-size:1.5rem;"></i>
-                    <div id="w_goal" style="font-size:1.5rem; font-weight:700; margin-top:5px;">0L</div>
-                    <div style="font-size:0.75rem;" data-i18n="lblGoal">Goal</div>
+                    <div id="w_goal" style="font-size:1.5rem; font-weight:700;">0L</div>
+                    <div style="font-size:0.7rem; color:var(--text-sub);">GOAL</div>
                 </div>
             </div>
 
-            <button class="btn-main" onclick="addWater()">
-                <i class="fas fa-plus"></i> <span data-i18n="btnDrink">Drink Water</span>
-            </button>
+            <button class="btn-primary" onclick="drinkWater()">Drink Water (250ml)</button>
         </div>
 
         <div id="view_meds" class="view-section">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="margin:0;" data-i18n="hMeds">Medications</h2>
-                <button onclick="openMedForm()" class="btn-main" style="width:40px; height:40px; border-radius:12px; padding:0;"><i class="fas fa-plus"></i></button>
+                <h2>Medications</h2>
+                <button onclick="openMedForm()" class="btn-primary" style="width:40px; height:40px; padding:0; border-radius:12px;"><i class="fas fa-plus"></i></button>
             </div>
             <div id="med_list"></div>
         </div>
 
         <div id="view_med_form" class="view-section">
-            <h2 id="form_title" data-i18n="hAddMed">Add Medication</h2>
-            <input type="hidden" id="m_edit_id"> <div class="card">
-                <label data-i18n="lblMedName">Medicine Name</label>
-                <input type="text" id="m_name" class="input-field" placeholder="e.g. Vitamin D">
+            <h2 id="form_title">Add Medication</h2>
+            <input type="hidden" id="m_edit_id">
 
-                <label data-i18n="lblFreq">Frequency</label>
-                <div style="display:flex; gap:10px; margin-bottom:20px;">
-                    <button class="input-field dose-btn active" onclick="setDose(1)" style="margin:0; text-align:center;">1x</button>
-                    <button class="input-field dose-btn" onclick="setDose(2)" style="margin:0; text-align:center;">2x</button>
-                    <button class="input-field dose-btn" onclick="setDose(3)" style="margin:0; text-align:center;">3x</button>
+            <div class="input-group">
+                <label>Medicine Name</label>
+                <input type="text" id="m_name" class="input-box" placeholder="e.g. Aspirin">
+            </div>
+
+            <div class="input-group">
+                <label>Frequency</label>
+                <div style="display:flex; gap:10px;">
+                    <button class="input-box dose-btn active" onclick="setDose(1)" style="text-align:center;">1x</button>
+                    <button class="input-box dose-btn" onclick="setDose(2)" style="text-align:center;">2x</button>
+                    <button class="input-box dose-btn" onclick="setDose(3)" style="text-align:center;">3x</button>
                 </div>
+            </div>
 
-                <label data-i18n="lblSetTime">Time(s)</label>
-                <div id="time_con" class="grid-2" style="margin-bottom:20px;">
-                    <input type="time" class="input-field time-inp" style="margin:0">
+            <div class="input-group">
+                <label>Time(s)</label>
+                <div id="time_con" class="row-stack">
+                    <input type="time" class="input-box time-inp">
                 </div>
+            </div>
 
-                <label data-i18n="lblRepeat">Repeat Days</label>
-                <div class="day-selector">
+            <div class="input-group">
+                <label>Repeat Days</label>
+                <div class="day-row">
                     <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="0">S</button>
                     <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="1">M</button>
                     <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="2">T</button>
@@ -384,25 +389,27 @@
                     <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="5">F</button>
                     <button class="day-btn active" onclick="this.classList.toggle('active')" data-d="6">S</button>
                 </div>
+            </div>
 
-                <label data-i18n="lblNote">Voice Note</label>
-                <input type="text" id="m_note" class="input-field" placeholder="Spoken Instructions...">
+            <div class="input-group">
+                <label>Voice Note</label>
+                <input type="text" id="m_note" class="input-box" placeholder="Instructions...">
+            </div>
 
-                <div class="grid-2">
-                    <button class="btn-main btn-sec" onclick="UI.nav('meds')" data-i18n="btnCancel">Cancel</button>
-                    <button class="btn-main" onclick="saveMed()" data-i18n="btnSave">Save</button>
-                </div>
+            <div class="row-stack">
+                <button class="btn-primary btn-sec" onclick="nav('meds')">Cancel</button>
+                <button class="btn-primary" onclick="saveMed()">Save</button>
             </div>
         </div>
 
     </div>
 
     <div id="nav_bar" class="nav-bar" style="display:none;">
-        <button class="nav-btn active" onclick="UI.nav('water')" id="nav_water">
-            <i class="fas fa-glass-water"></i> <span data-i18n="navWater">Water</span>
+        <button class="nav-btn active" onclick="nav('water')" id="nav_water">
+            <i class="fas fa-glass-water"></i> <span>Water</span>
         </button>
-        <button class="nav-btn" onclick="UI.nav('meds')" id="nav_meds">
-            <i class="fas fa-pills"></i> <span data-i18n="navMeds">Meds</span>
+        <button class="nav-btn" onclick="nav('meds')" id="nav_meds">
+            <i class="fas fa-pills"></i> <span>Meds</span>
         </button>
     </div>
 
@@ -410,223 +417,233 @@
 
 <div class="modal-overlay" id="alert_modal">
     <div class="modal-box">
-        <div style="width:60px; height:60px; background:rgba(236,72,153,0.1); color:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 15px;">
-            <i class="fas fa-bell"></i>
-        </div>
+        <i class="fas fa-bell" style="font-size:3rem; color:var(--accent); margin-bottom:15px;"></i>
         <h2 id="alert_t">Alert</h2>
         <p id="alert_b" style="color:var(--text-sub); margin-bottom:20px;">Time up!</p>
-        <button class="btn-main" onclick="AudioSys.stop()">Dismiss</button>
+        <button class="btn-primary" onclick="stopAlert()">Dismiss</button>
     </div>
 </div>
 
-<div class="modal-overlay" id="success_modal">
+<div class="modal-overlay" id="win_modal">
     <div class="modal-box">
-        <div style="width:60px; height:60px; background:rgba(16, 185, 129, 0.1); color:var(--success); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 15px;">
-            <i class="fas fa-trophy"></i>
-        </div>
-        <h2>Goal Reached!</h2>
-        <p style="color:var(--text-sub); margin-bottom:20px;">You are fully hydrated today!</p>
-        <button class="btn-main" onclick="document.getElementById('success_modal').style.display='none'">Awesome</button>
+        <i class="fas fa-trophy" style="font-size:3rem; color:#10b981; margin-bottom:15px;"></i>
+        <h2>Goal Met!</h2>
+        <p style="color:var(--text-sub); margin-bottom:20px;">You are fully hydrated!</p>
+        <button class="btn-primary" onclick="document.getElementById('win_modal').style.display='none'">Awesome</button>
     </div>
 </div>
 
 <script>
-    /* --- DATA & TRANSLATIONS --- */
-    const T = {
-        en: { appTitle: "HealthHub Pro", appSub: "Ultimate Wellness Companion", welcome: "Welcome,", lblName: "Your Name", lblDob: "Date of Birth", lblAge: "Age", lblLang: "Language", btnStart: "Start Journey", noteLock: "Enable Lock Screen Notifications", hWaterSetup: "Hydration Plan", subWaterSetup: "Set your daily goal.", lblWeight: "Weight (KG)", lblWake: "Wake Up", lblBed: "Bed Time", lblInterval: "Interval", btnCalc: "Create Plan", hWaterTrack: "Hydration", lblNextSip: "Next Sip", lblDrunk: "Drunk", lblGoal: "Goal", btnDrink: "Drink Water", hMeds: "Medications", noMeds: "No reminders set.", hAddMed: "Add Medication", lblMedName: "Medicine Name", lblFreq: "Frequency", lblSetTime: "Time(s)", lblRepeat: "Repeat Days", lblNote: "Voice Note", btnCancel: "Cancel", btnSave: "Save", navWater: "Water", navMeds: "Meds", test: "Test Audio" },
-        hi: { appTitle: "हेल्थहब प्रो", appSub: "आपका स्वास्थ्य साथी", welcome: "स्वागत है,", lblName: "नाम", lblDob: "जन्म तिथि", lblAge: "आयु", lblLang: "भाषा", btnStart: "शुरू करें", noteLock: "लॉक स्क्रीन सूचनाएं", hWaterSetup: "हाइड्रेशन", subWaterSetup: "लक्ष्य निर्धारित करें", lblWeight: "वजन (किलो)", lblWake: "जागना", lblBed: "सोना", lblInterval: "अंतराल", btnCalc: "प्लान बनाएं", hWaterTrack: "हाइड्रेशन", lblNextSip: "अगला घूँट", lblDrunk: "पी लिया", lblGoal: "लक्ष्य", btnDrink: "पानी पिएं", hMeds: "दवाइयाँ", noMeds: "कोई रिमाइंडर नहीं", hAddMed: "दवा जोड़ें", lblMedName: "दवा का नाम", lblFreq: "आवृत्ति", lblSetTime: "समय", lblRepeat: "दिन", lblNote: "नोट", btnCancel: "रद्द", btnSave: "सहेजें", navWater: "पानी", navMeds: "दवा", test: "टेस्ट" },
-        gu: { appTitle: "હેલ્થહબ પ્રો", appSub: "તમારો સ્વાસ્થ્ય સાથી", welcome: "સ્વાગત,", lblName: "નામ", lblDob: "જન્મ તારીખ", lblAge: "ઉંમર", lblLang: "ભાષા", btnStart: "શરૂ કરો", noteLock: "સૂચનાઓ ચાલુ કરો", hWaterSetup: "હાઇડ્રેશન", subWaterSetup: "લક્ષ્ય નક્કી કરો", lblWeight: "વજન (કિલો)", lblWake: "જાગવું", lblBed: "સૂવું", lblInterval: "અંતરાલ", btnCalc: "પ્લાન બનાવો", hWaterTrack: "હાઇડ્રેશન", lblNextSip: "આગળનો ઘૂંટડો", lblDrunk: "પીધું", lblGoal: "લક્ષ્ય", btnDrink: "પાણી પીવો", hMeds: "દવાઓ", noMeds: "કોઈ રિમાઇન્ડર નથી", hAddMed: "દવા ઉમેરો", lblMedName: "દવાનું નામ", lblFreq: "આવર્તન", lblSetTime: "સમય", lblRepeat: "દિવસો", lblNote: "નોંધ", btnCancel: "રદ", btnSave: "સાચવો", navWater: "પાણી", navMeds: "દવા", test: "ટેસ્ટ" }
-    };
+    /* --- SYSTEM SETUP --- */
     let lang = 'en';
     let isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    
+    // Check iOS
+    if(isIOS) document.getElementById('ios_alert').style.display = 'block';
 
-    /* --- AUDIO ENGINE --- */
+    /* --- AUDIO & VIBRATION ENGINE --- */
     const AudioSys = {
         ctx: null, interval: null,
-        init: () => { if(!AudioSys.ctx) AudioSys.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+        init: () => { 
+            if(!AudioSys.ctx) AudioSys.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
+            // Silent resume for iOS
+            if(AudioSys.ctx.state === 'suspended') AudioSys.ctx.resume();
+        },
         tone: () => {
-            if(AudioSys.ctx && AudioSys.ctx.state === 'suspended') AudioSys.ctx.resume();
+            if(AudioSys.ctx.state === 'suspended') AudioSys.ctx.resume();
             const o = AudioSys.ctx.createOscillator();
             const g = AudioSys.ctx.createGain();
             o.connect(g); g.connect(AudioSys.ctx.destination);
             o.frequency.setValueAtTime(600, AudioSys.ctx.currentTime);
             g.gain.setValueAtTime(0.5, AudioSys.ctx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.001, AudioSys.ctx.currentTime+0.5);
-            o.start(); o.stop(AudioSys.ctx.currentTime+0.5);
+            g.gain.exponentialRampToValueAtTime(0.001, AudioSys.ctx.currentTime + 0.5);
+            o.start(); o.stop(AudioSys.ctx.currentTime + 0.5);
         },
         speak: (txt) => {
             window.speechSynthesis.cancel();
             const u = new SpeechSynthesisUtterance(txt);
-            const voices = window.speechSynthesis.getVoices();
-            const v = voices.find(vo => vo.lang.startsWith(lang));
+            const v = window.speechSynthesis.getVoices().find(vo => vo.lang.startsWith(document.getElementById('u_lang').value));
             if(v) u.voice = v;
-            u.lang = lang; 
             window.speechSynthesis.speak(u);
         },
         trigger: (title, body, speech) => {
             document.getElementById('alert_modal').style.display='flex';
             document.getElementById('alert_t').innerText = title;
             document.getElementById('alert_b').innerText = body;
-            const act = () => { 
-                AudioSys.tone(); 
-                if(speech) AudioSys.speak(speech); 
-                // Android Vibration
+            
+            const act = () => {
+                AudioSys.tone();
+                if(speech) AudioSys.speak(speech);
                 if(navigator.vibrate && !isIOS) navigator.vibrate([500, 200, 500]);
             };
             act();
             AudioSys.interval = setInterval(act, 4000);
-            if(Notification.permission==='granted') new Notification(title,{body});
-        },
-        stop: () => { clearInterval(AudioSys.interval); window.speechSynthesis.cancel(); document.getElementById('alert_modal').style.display='none'; }
-    };
-    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-
-    /* --- LOGIC --- */
-    function toggleTheme() { 
-        const b = document.body;
-        const current = b.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
-        b.setAttribute('data-theme', next);
-        document.getElementById('theme_icon').innerHTML = next === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    }
-    
-    function changeLang(l) { lang = l; applyLang(); }
-    function applyLang() { 
-        const t = T[lang];
-        document.querySelectorAll('[data-i18n]').forEach(e=>e.innerText = t[e.dataset.i18n] || e.innerText);
-    }
-    
-    const UI = {
-        show: (id) => {
-            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        },
-        nav: (loc) => {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('nav_'+loc).classList.add('active');
-            if(loc === 'water') {
-                water.goal > 0 ? UI.show('view_water') : UI.show('view_water_setup');
-            } else {
-                UI.show('view_meds');
+            
+            if('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, { body: body });
             }
+        },
+        stop: () => {
+            clearInterval(AudioSys.interval);
+            window.speechSynthesis.cancel();
+            document.getElementById('alert_modal').style.display='none';
         }
     };
+    
+    /* --- CORE LOGIC --- */
+    function toggleTheme() {
+        const b = document.body;
+        b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    }
 
-    function loadImg(e) { 
-        const r=new FileReader(); 
-        r.onload=ev=>{ document.getElementById('img_preview').src=ev.target.result; document.getElementById('img_preview').style.display='block'; document.getElementById('head_avatar').src=ev.target.result; };
+    function showView(id) {
+        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function nav(loc) {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('nav_'+loc).classList.add('active');
+        if(loc === 'water') {
+            water.goal > 0 ? showView('view_water') : showView('view_water_setup');
+        } else {
+            showView('view_meds');
+        }
+    }
+
+    /* --- LOGIN --- */
+    function loadImg(e) {
+        const r = new FileReader();
+        r.onload = ev => {
+            document.getElementById('img_preview').src = ev.target.result;
+            document.getElementById('img_preview').style.display = 'block';
+            document.getElementById('cam_icon').style.display = 'none';
+            document.getElementById('head_avatar').src = ev.target.result;
+        }
         r.readAsDataURL(e.target.files[0]);
     }
+
     function calcAge() {
         const d = document.getElementById('u_dob').value;
         if(d) document.getElementById('u_age').value = Math.abs(new Date(Date.now()-new Date(d).getTime()).getUTCFullYear()-1970);
     }
-    function testAudio() { AudioSys.init(); AudioSys.speak(lang==='en'?"Testing Voice": (lang==='hi'?"आवाज़ टेस्ट":"અવાજ ટેસ્ટ")); }
-    
-    function handleLogin() {
+
+    function testAudio() {
+        AudioSys.init();
+        AudioSys.speak("Testing Audio System");
+    }
+
+    function doLogin() {
         const n = document.getElementById('u_name').value;
         if(!n) return alert("Enter Name");
         document.getElementById('head_name').innerText = n;
-        document.getElementById('main_header').style.display='flex';
-        document.getElementById('nav_bar').style.display='flex';
+        document.getElementById('header_bar').style.display = 'flex';
+        document.getElementById('nav_bar').style.display = 'flex';
         AudioSys.init();
-        if(isIOS) document.getElementById('ios_note').style.display = 'block';
         if('Notification' in window) Notification.requestPermission();
-        UI.nav('water');
+        nav('water');
     }
 
-    /* Water */
+    /* --- WATER --- */
     let water = { t:null, left:0, max:0, goal:0, cnt:0 };
+    
     function startWater() {
         const w = document.getElementById('w_weight').value;
-        if(!w) return;
-        const l = (w*0.033).toFixed(1);
+        if(!w) return alert("Enter Weight");
+        const l = (w * 0.033).toFixed(1);
         water.goal = Math.ceil((l*1000)/250);
         document.getElementById('w_goal').innerText = l + 'L';
-        water.max = parseInt(document.getElementById('w_int').value)*60;
+        water.max = parseInt(document.getElementById('w_int').value) * 60;
         water.left = water.max;
-        UI.show('view_water');
+        showView('view_water');
         runWater();
     }
+
     function runWater() {
         clearInterval(water.t);
         drawWater();
         water.t = setInterval(() => {
-            water.left--; drawWater();
-            if(water.left<=0) { clearInterval(water.t); AudioSys.trigger("Hydrate", "Time to drink water!", "Drink Water"); }
+            water.left--;
+            drawWater();
+            if(water.left <= 0) {
+                clearInterval(water.t);
+                AudioSys.trigger("Hydrate", "Time to drink water!", "Drink Water");
+            }
         }, 1000);
     }
+
     function drawWater() {
-        const m = Math.floor(water.left/60).toString().padStart(2,'0');
-        const s = (water.left%60).toString().padStart(2,'0');
+        const m = Math.floor(water.left / 60).toString().padStart(2,'0');
+        const s = (water.left % 60).toString().padStart(2,'0');
         document.getElementById('w_timer').innerText = m+":"+s;
         document.getElementById('w_ring').style.strokeDashoffset = 500 - (500 * (water.left/water.max));
     }
-    function addWater() { 
-        water.cnt++; 
-        document.getElementById('w_drunk').innerText=water.cnt; 
-        if(water.cnt >= water.goal) document.getElementById('success_modal').style.display='flex';
-        AudioSys.stop(); water.left=water.max; runWater(); 
+
+    function drinkWater() {
+        water.cnt++;
+        document.getElementById('w_count').innerText = water.cnt;
+        if(water.cnt >= water.goal) document.getElementById('win_modal').style.display = 'flex';
+        stopAlert(); // Stop sound if playing
+        water.left = water.max;
+        runWater();
     }
 
-    /* Meds - WITH EDIT */
+    function stopAlert() { AudioSys.stop(); }
+
+    /* --- MEDS (WITH EDITING) --- */
     let meds = [];
-    function setDose(n) {
-        document.querySelectorAll('.dose-btn').forEach((b,i)=>b.classList.toggle('active', i+1===n));
-        const c=document.getElementById('time_con'); c.innerHTML='';
-        for(let i=0;i<n;i++) c.innerHTML+=`<input type="time" class="input-field time-inp" style="margin:0">`;
-    }
-    
-    function openMedForm(id = null) {
-        const t = T[lang];
-        document.getElementById('form_title').innerText = id ? (lang==='en'?"Edit Medication":t.hAddMed) : t.hAddMed;
-        document.getElementById('m_edit_id').value = id || '';
 
+    function setDose(n) {
+        document.querySelectorAll('.dose-btn').forEach((b,i) => b.classList.toggle('active', i+1===n));
+        const c = document.getElementById('time_con'); c.innerHTML='';
+        for(let i=0; i<n; i++) c.innerHTML += `<input type="time" class="input-box time-inp">`;
+    }
+
+    function openMedForm(id = null) {
+        document.getElementById('form_title').innerText = id ? "Edit Medication" : "Add Medication";
+        document.getElementById('m_edit_id').value = id || '';
+        
         if(id) {
-            // Edit Mode: Fill Data
             const m = meds.find(x => x.id === id);
             document.getElementById('m_name').value = m.name;
             document.getElementById('m_note').value = m.note;
             setDose(m.times.length);
             setTimeout(() => {
-                const inputs = document.querySelectorAll('.time-inp');
-                m.times.forEach((val, i) => inputs[i].value = val);
+                const inps = document.querySelectorAll('.time-inp');
+                m.times.forEach((t, i) => inps[i].value = t);
             }, 50);
-            // Set Days
-            document.querySelectorAll('.day-btn').forEach(btn => {
-                btn.classList.toggle('active', m.days.includes(parseInt(btn.dataset.d)));
+            document.querySelectorAll('.day-btn').forEach(b => {
+                b.classList.toggle('active', m.days.includes(parseInt(b.dataset.d)));
             });
         } else {
-            // New Mode
-            document.getElementById('m_name').value='';
-            document.getElementById('m_note').value='';
+            document.getElementById('m_name').value = '';
+            document.getElementById('m_note').value = '';
             setDose(1);
             document.querySelectorAll('.day-btn').forEach(b => b.classList.add('active'));
         }
-        UI.show('view_med_form'); 
+        showView('view_med_form');
     }
-    
+
     function saveMed() {
         const name = document.getElementById('m_name').value;
-        const times = Array.from(document.querySelectorAll('.time-inp')).map(i=>i.value).filter(v=>v);
-        const days = Array.from(document.querySelectorAll('.day-btn.active')).map(d=>parseInt(d.dataset.d));
-        const editId = document.getElementById('m_edit_id').value;
-        
-        if(!name || !times.length) return alert("Fill details");
-        
-        // Remove old if editing
-        if(editId) meds = meds.filter(m => m.id != editId);
-        
-        meds.push({id:Date.now(), name, times, days, note:document.getElementById('m_note').value});
+        const times = Array.from(document.querySelectorAll('.time-inp')).map(i => i.value).filter(v => v);
+        const days = Array.from(document.querySelectorAll('.day-btn.active')).map(b => parseInt(b.dataset.d));
+        const id = document.getElementById('m_edit_id').value;
+
+        if(!name || !times.length) return alert("Fill all details");
+
+        if(id) meds = meds.filter(m => m.id != id); // Remove old if editing
+
+        meds.push({ id: Date.now(), name, times, days, note: document.getElementById('m_note').value });
         renderMeds();
-        UI.nav('meds');
+        nav('meds');
     }
-    
+
     function renderMeds() {
         const c = document.getElementById('med_list');
-        if(!meds.length) c.innerHTML = `<p style="text-align:center; opacity:0.6; margin-top:40px;">${T[lang].noMeds}</p>`;
+        if(!meds.length) c.innerHTML = '<p style="text-align:center; opacity:0.6; margin-top:40px;">No medications.</p>';
         else c.innerHTML = meds.map(m => `
-            <div class="med-item">
+            <div class="med-card">
                 <div class="med-left">
                     <div class="med-icon"><i class="fas fa-pills"></i></div>
                     <div>
@@ -635,32 +652,31 @@
                     </div>
                 </div>
                 <div class="med-actions">
-                    <button class="icon-btn" onclick="openMedForm(${m.id})"><i class="fas fa-pencil"></i></button>
-                    <button class="icon-btn" onclick="meds=meds.filter(x=>x.id!=${m.id});renderMeds()" style="color:#ef4444;"><i class="fas fa-trash"></i></button>
+                    <button class="action-btn" onclick="openMedForm(${m.id})"><i class="fas fa-pencil"></i></button>
+                    <button class="action-btn" onclick="deleteMed(${m.id})" style="color:#ef4444;"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
         `).join('');
     }
 
-    // Loop
+    function deleteMed(id) { meds = meds.filter(m => m.id !== id); renderMeds(); }
+
+    /* --- CLOCK LOOP --- */
     setInterval(() => {
         const d = new Date();
-        document.getElementById('clock_display').innerText = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-        if(d.getSeconds()===0) {
-            const t = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false});
-            const dy = d.getDay();
+        if(d.getSeconds() === 0) {
+            const t = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
+            const day = d.getDay();
             meds.forEach(m => {
-                if(m.days.includes(dy) && m.times.includes(t)) AudioSys.trigger("Medicine", `Take ${m.name}`, m.note||m.name);
+                if(m.days.includes(day) && m.times.includes(t)) {
+                    AudioSys.trigger("Medication", `Take ${m.name}`, m.note || m.name);
+                }
             });
         }
     }, 1000);
 
-    // Initial Setup
+    // Init
     setDose(1);
-    if(isIOS) {
-        // Show iOS note on login
-        document.getElementById('ios_note').style.display = 'block';
-    }
 </script>
 </body>
 </html>
