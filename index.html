@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>HealthHub Ultimate v2</title>
+<title>HealthHub V3 (Stable)</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
     :root {
@@ -14,7 +14,7 @@
         --danger: #ef4444;
         
         /* Glass Vars */
-        --glass-bg: rgba(255, 255, 255, 0.85); /* Slightly more opaque for readability */
+        --glass-bg: rgba(255, 255, 255, 0.85);
         --glass-border: rgba(255, 255, 255, 0.6);
         --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         --input-bg: rgba(255, 255, 255, 0.6);
@@ -29,6 +29,14 @@
         --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
         --input-bg: rgba(0, 0, 0, 0.3);
     }
+    
+    /* --- NEW: Strobe Animation for iOS Alerts --- */
+    @keyframes strobe {
+        0% { background-color: var(--glass-bg); }
+        50% { background-color: #ef4444; } /* Red Flash */
+        100% { background-color: var(--glass-bg); }
+    }
+    .strobe-mode { animation: strobe 0.5s infinite; }
 
     * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
@@ -440,54 +448,38 @@
         get: (key) => Lang.dict[Lang.curr][key] || key
     };
 
-    /* --- 2. SYSTEM CORE --- */
-    const System = {
-        wakeLock: null, alertInt: null,
-        init: async () => { if ("Notification" in window) await Notification.requestPermission(); },
-        toggleWakeLock: async () => {
-            const btn = document.getElementById('wakelockBtn');
-            if (System.wakeLock) {
-                System.wakeLock.release(); System.wakeLock = null;
-                btn.classList.remove('active'); document.getElementById('lockStatus').innerText = "";
-            } else {
-                try {
-                    System.wakeLock = await navigator.wakeLock.request('screen');
-                    btn.classList.add('active');
-                    document.getElementById('lockStatus').innerText = "⚡ ON";
-                } catch(e) { alert("WakeLock failed"); }
-            }
-        },
-        trigger: (title, msg, speakText) => {
-            const modal = document.getElementById('alertModal');
-            document.getElementById('alertTitle').innerText = title;
-            document.getElementById('alertMsg').innerText = msg;
-            modal.style.display = 'flex';
-            if(Notification.permission === "granted") new Notification(title, { body: msg });
-            const action = () => {
-                AudioSys.playTone();
-                AudioSys.speak(speakText);
-                if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
-            };
-            action();
-            System.alertInt = setInterval(action, 5000);
-        },
-        stopAlert: (isSuccess = false) => {
-            clearInterval(System.alertInt);
-            if(window.speechSynthesis) window.speechSynthesis.cancel();
-            if(navigator.vibrate) navigator.vibrate(0);
-            document.getElementById('alertModal').style.display = 'none';
-            if(isSuccess) {
-                const sModal = document.getElementById('successModal');
-                sModal.style.display = 'flex';
-                document.getElementById('successMsg').innerText = "Reminder Completed";
-                setTimeout(() => { sModal.style.display = 'none'; }, 3000);
-            }
-        }
-    };
-
+    /* --- 2. AUDIO SYSTEM (ROBUST V3 FIX) --- */
     const AudioSys = {
         ctx: null,
-        init: () => { if(!AudioSys.ctx) AudioSys.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+        unlocked: false,
+        
+        init: () => { 
+            if(!AudioSys.ctx) AudioSys.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
+        },
+
+        // UNLOCKER: Called on first user interaction to wake up engines
+        unlock: () => {
+            if(AudioSys.unlocked) return;
+            AudioSys.init();
+            
+            // 1. Wake AudioContext (iOS/Safari)
+            if(AudioSys.ctx.state === 'suspended') AudioSys.ctx.resume();
+            const src = AudioSys.ctx.createBufferSource();
+            src.buffer = AudioSys.ctx.createBuffer(1, 1, 22050);
+            src.connect(AudioSys.ctx.destination);
+            src.start(0);
+
+            // 2. Wake TTS (Android/Chrome) - Clear stuck queues
+            if('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance("");
+                window.speechSynthesis.speak(utter);
+            }
+            
+            AudioSys.unlocked = true;
+            console.log("Audio System Unlocked");
+        },
+
         playTone: () => {
             if(!AudioSys.ctx) AudioSys.init();
             if(AudioSys.ctx.state === 'suspended') AudioSys.ctx.resume();
@@ -498,17 +490,86 @@
             gain.gain.exponentialRampToValueAtTime(0.01, AudioSys.ctx.currentTime + 0.5);
             osc.start(); osc.stop(AudioSys.ctx.currentTime + 0.5);
         },
+
         speak: (text) => {
             if('speechSynthesis' in window) {
+                // IMPORTANT: Always cancel previous speech to prevent Android queue freeze
+                window.speechSynthesis.cancel(); 
+                
                 const utter = new SpeechSynthesisUtterance(text);
-                if(Lang.curr === 'hi') utter.lang = 'hi-IN';
-                if(Lang.curr === 'gu') utter.lang = 'gu-IN';
+                
+                // Use English as fallback to ensure it speaks even if Hindi/Gujarati voice pack is missing
+                utter.lang = Lang.curr === 'en' ? 'en-US' : (Lang.curr === 'hi' ? 'hi-IN' : 'gu-IN');
+                
+                // Force volume and rate for iOS
+                utter.volume = 1;
+                utter.rate = 1;
+
                 window.speechSynthesis.speak(utter);
             }
         }
     };
 
-    /* --- 3. LOGIN & APP STATE --- */
+    /* --- 3. SYSTEM CORE (WAKE LOCK, STROBE & NOTIFS) --- */
+    const System = {
+        wakeLock: null, alertInt: null,
+        init: async () => { if ("Notification" in window) await Notification.requestPermission(); },
+        
+        toggleWakeLock: async () => {
+            const btn = document.getElementById('wakelockBtn');
+            if (System.wakeLock) {
+                System.wakeLock.release(); System.wakeLock = null;
+                btn.classList.remove('active'); document.getElementById('lockStatus').innerText = "";
+            } else {
+                try {
+                    System.wakeLock = await navigator.wakeLock.request('screen');
+                    btn.classList.add('active');
+                    document.getElementById('lockStatus').innerText = "⚡ ON";
+                } catch(e) { alert("Display Keep-Awake not supported"); }
+            }
+        },
+
+        trigger: (title, msg, speakText) => {
+            const modal = document.getElementById('alertModal');
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMsg').innerText = msg;
+            modal.style.display = 'flex';
+
+            // VISUAL FIX: Strobe effect for iOS (since Vibration is blocked)
+            document.body.classList.add('strobe-mode');
+
+            if(Notification.permission === "granted") new Notification(title, { body: msg });
+
+            const action = () => {
+                AudioSys.playTone();
+                // Delay speech slightly to avoid overlap with tone
+                setTimeout(() => AudioSys.speak(speakText), 400);
+                if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
+            };
+            action();
+            System.alertInt = setInterval(action, 5000); // Repeat every 5s
+        },
+
+        stopAlert: (isSuccess = false) => {
+            clearInterval(System.alertInt);
+            
+            // Remove Strobe
+            document.body.classList.remove('strobe-mode');
+
+            if(window.speechSynthesis) window.speechSynthesis.cancel();
+            if(navigator.vibrate) navigator.vibrate(0);
+            document.getElementById('alertModal').style.display = 'none';
+            
+            if(isSuccess) {
+                const sModal = document.getElementById('successModal');
+                sModal.style.display = 'flex';
+                document.getElementById('successMsg').innerText = "Reminder Completed";
+                setTimeout(() => { sModal.style.display = 'none'; }, 3000);
+            }
+        }
+    };
+
+    /* --- 4. LOGIN & APP STATE --- */
     window.onload = function() {
         const savedUser = Store.getUser();
         if(savedUser) {
@@ -560,6 +621,9 @@
     }
 
     function handleLogin(skipSave = false) {
+        // --- KEY AUDIO FIX: Unlock Audio on First Interaction ---
+        AudioSys.unlock();
+
         const name = document.getElementById('u_name').value;
         const dob = document.getElementById('u_dob').value;
         const lang = document.getElementById('u_lang').value;
@@ -595,7 +659,7 @@
         MedApp.startWatcher();
     }
 
-    /* --- 4. WATER APP --- */
+    /* --- 5. WATER APP --- */
     const WaterApp = {
         timer: null, timeLeft: 0, totalTime: 0, count: 0, goal: 0,
         start: (isRestoring = false) => {
@@ -668,7 +732,7 @@
         }
     };
 
-    /* --- 5. MED APP --- */
+    /* --- 6. MED APP --- */
     const MedApp = {
         items: [],
         setFreq: (n) => {
