@@ -3,28 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>HealthHub Pro | Voice Edition</title>
+<title>HealthHub Ultimate v2</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
     :root {
         --text: #1e293b;
         --text-muted: #64748b;
         --primary: #4f46e5;
+        --success: #10b981;
+        --danger: #ef4444;
         
         /* Glass Vars */
-        --glass-bg: rgba(255, 255, 255, 0.65);
-        --glass-border: rgba(255, 255, 255, 0.4);
-        --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        --input-bg: rgba(255, 255, 255, 0.5);
+        --glass-bg: rgba(255, 255, 255, 0.85); /* Slightly more opaque for readability */
+        --glass-border: rgba(255, 255, 255, 0.6);
+        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        --input-bg: rgba(255, 255, 255, 0.6);
     }
 
     [data-theme="dark"] {
         --text: #f8fafc;
         --text-muted: #94a3b8;
         --primary: #818cf8;
-        --glass-bg: rgba(30, 41, 59, 0.7);
+        --glass-bg: rgba(15, 23, 42, 0.85);
         --glass-border: rgba(255, 255, 255, 0.1);
-        --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
         --input-bg: rgba(0, 0, 0, 0.3);
     }
 
@@ -37,28 +39,24 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 20px;
+        padding: 15px;
         overflow-x: hidden;
         color: var(--text);
-        
-        /* --- CHANGING BACKGROUND ANIMATION --- */
-        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-        background-size: 400% 400%;
-        animation: gradientShift 15s ease infinite;
+        background: linear-gradient(135deg, #8EC5FC 0%, #E0C3FC 100%);
+        transition: background 0.5s;
+    }
+    
+    [data-theme="dark"] body {
+        background: linear-gradient(135deg, #0f172a 0%, #312e81 100%);
     }
 
-    @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    /* --- Glass Container --- */
+    /* --- Layout & Glass --- */
     .app-container {
         width: 100%;
-        max-width: 420px;
+        max-width: 400px;
         position: relative;
         z-index: 10;
+        margin-top: 45px;
     }
 
     .glass-card {
@@ -66,328 +64,429 @@
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border: 1px solid var(--glass-border);
-        border-top: 1px solid rgba(255,255,255,0.8);
         border-radius: 32px;
         box-shadow: var(--glass-shadow);
-        padding: 30px;
-        transition: 0.4s ease;
+        padding: 25px;
+        transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         display: none;
         opacity: 0;
-        transform: translateY(20px) scale(0.95);
+        transform: translateY(20px) scale(0.98);
     }
     .glass-card.active { display: block; opacity: 1; transform: translateY(0) scale(1); }
 
     /* --- Typography & Inputs --- */
-    h1 { font-size: 2rem; font-weight: 700; margin: 0 0 5px 0; text-align: center; letter-spacing: -0.5px; }
-    h2 { font-size: 1.4rem; margin: 0 0 20px 0; }
-    p.sub { text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px; }
+    h1 { font-size: 1.8rem; font-weight: 700; margin: 0 0 5px 0; text-align: center; }
+    p.sub { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; }
 
-    label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin: 0 0 8px 10px; }
+    label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin: 0 0 6px 10px; text-transform: uppercase; letter-spacing: 0.5px; }
     
-    input, select, textarea {
-        width: 100%; padding: 16px 20px; border-radius: 20px;
+    input, select {
+        width: 100%; padding: 14px 18px; border-radius: 18px;
         border: 1px solid var(--glass-border);
         background: var(--input-bg);
         color: var(--text); font-family: inherit; font-size: 1rem;
-        transition: 0.3s; margin-bottom: 20px;
+        transition: 0.3s; margin-bottom: 15px;
         backdrop-filter: blur(5px);
+        -webkit-appearance: none;
     }
-    textarea { resize: none; height: 80px; }
-    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); background: rgba(255,255,255,0.1); }
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15); background: rgba(255,255,255,0.2); }
 
     /* --- Profile Upload --- */
     .profile-upload {
-        width: 100px; height: 100px; margin: 0 auto 20px;
+        width: 110px; height: 110px; margin: 0 auto 20px;
         border-radius: 50%; overflow: hidden;
-        border: 2px dashed var(--glass-border);
+        border: 3px dashed var(--glass-border);
         background: var(--input-bg);
         display: flex; align-items: center; justify-content: center;
-        cursor: pointer; position: relative; transition: 0.3s;
+        cursor: pointer; position: relative;
     }
-    .profile-upload:hover { border-color: var(--primary); transform: scale(1.05); }
     .profile-upload img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .profile-upload i { font-size: 1.5rem; color: var(--text-muted); }
+    .icon-cam { font-size: 2rem; color: var(--text-muted); opacity: 0.5; }
 
-    /* --- Liquid Button --- */
+    /* --- Buttons --- */
     .btn-liquid {
-        width: 100%; padding: 18px; border-radius: 24px;
-        border: 1px solid rgba(255,255,255,0.3);
+        width: 100%; padding: 16px; border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.2);
         background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
-        color: white; font-weight: 600; font-size: 1.1rem;
+        color: white; font-weight: 600; font-size: 1.05rem;
         position: relative; overflow: hidden; cursor: pointer;
         backdrop-filter: blur(10px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.2);
-        transition: 0.3s;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transition: 0.2s;
     }
     .btn-liquid::before {
         content: ''; position: absolute; inset: 0;
-        background: linear-gradient(90deg, #4f46e5, #ec4899);
-        z-index: -1; opacity: 0.8; transition: 0.3s;
+        background: linear-gradient(90deg, var(--primary), #ec4899);
+        z-index: -1; opacity: 0.9;
     }
-    .btn-liquid::after {
-        content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-        transform: skewX(-20deg); transition: 0.5s;
-    }
-    .btn-liquid:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3); }
-    .btn-liquid:hover::after { left: 100%; transition: 0.7s; }
-    .btn-liquid:active { transform: scale(0.98); }
+    .btn-liquid:active { transform: scale(0.96); }
 
-    /* --- App Header & Profile --- */
-    .app-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; }
-    .user-info { display: flex; align-items: center; gap: 15px; }
+    /* --- Top Controls --- */
+    .top-controls {
+        position: fixed; top: 0; left: 0; right: 0;
+        padding: 10px 15px;
+        display: flex; justify-content: space-between; align-items: center;
+        z-index: 100;
+        pointer-events: none;
+    }
+    .control-group { display: flex; gap: 8px; pointer-events: auto; }
+    .control-btn {
+        background: rgba(255,255,255,0.25); backdrop-filter: blur(8px);
+        padding: 8px 12px; border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.3);
+        color: #fff; font-size: 0.75rem; font-weight: 700;
+        cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .control-btn.active { background: #10b981; border-color: #10b981; }
+    .control-btn.danger { background: #ef4444; border-color: #ef4444; }
+
+    /* --- Header & Avatar --- */
+    .app-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .user-info { display: flex; align-items: center; gap: 12px; }
     .user-avatar {
         width: 50px; height: 50px; border-radius: 50%;
         background: var(--input-bg); border: 2px solid rgba(255,255,255,0.5);
-        object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    
+    .age-badge { font-size: 0.7rem; background: var(--input-bg); padding: 2px 8px; border-radius: 10px; margin-top: 2px; display: inline-block; font-weight: 600; color: var(--text-muted); }
+
     /* --- Tabs --- */
-    .tabs { display: flex; background: var(--input-bg); padding: 5px; border-radius: 20px; margin-bottom: 30px; }
+    .tabs { display: flex; background: var(--input-bg); padding: 4px; border-radius: 18px; margin-bottom: 25px; }
     .tab {
-        flex: 1; padding: 12px; border: none; background: transparent;
-        border-radius: 16px; color: var(--text-muted); font-weight: 600;
+        flex: 1; padding: 10px; border: none; background: transparent;
+        border-radius: 14px; color: var(--text-muted); font-weight: 600; font-size: 0.9rem;
         cursor: pointer; transition: 0.3s;
     }
-    .tab.active { background: #fff; color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    [data-theme="dark"] .tab.active { background: rgba(255,255,255,0.1); color: #fff; }
+    .tab.active { background: var(--glass-bg); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 
-    /* --- Frequency Buttons --- */
-    .freq-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-    .freq-btn {
-        padding: 12px; border-radius: 16px; border: 1px solid var(--glass-border);
-        background: var(--input-bg); color: var(--text-muted); cursor: pointer; transition: 0.3s;
-    }
-    .freq-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3); }
-
-    /* --- NEW DAYS SELECTOR UI --- */
-    .days-wrapper {
-        display: flex; justify-content: space-between; gap: 5px; margin-bottom: 25px;
-    }
-    .day-pill {
-        width: 42px; height: 42px;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 50%; /* Circle shape */
-        background: var(--input-bg);
-        border: 1px solid var(--glass-border);
-        color: var(--text-muted);
-        font-weight: 700; font-size: 0.85rem;
-        cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        user-select: none;
-    }
-    .day-pill input { display: none; } /* Hide checkbox */
-    
-    /* Active State for Days */
-    .day-pill.selected {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
-        transform: translateY(-2px) scale(1.1);
-        box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
-    }
-
-    /* --- Med & Water Items --- */
-    .water-ring { width: 160px; height: 160px; margin: 0 auto 30px; position: relative; }
-    .water-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-    .water-ring circle { fill: none; stroke-width: 15; stroke-linecap: round; cx: 80; cy: 80; r: 70; }
-    .ring-bg { stroke: rgba(0,0,0,0.05); }
-    [data-theme="dark"] .ring-bg { stroke: rgba(255,255,255,0.05); }
-    .ring-val { stroke: #0ea5e9; stroke-dasharray: 440; stroke-dashoffset: 440; transition: 1s linear; filter: drop-shadow(0 0 10px #0ea5e9); }
-    
+    /* --- Lists & Utilities --- */
     .med-item {
-        background: rgba(255,255,255,0.5); backdrop-filter: blur(5px);
-        padding: 15px 20px; border-radius: 20px; margin-bottom: 12px;
+        background: var(--input-bg); padding: 12px; border-radius: 16px; margin-bottom: 10px;
         display: flex; justify-content: space-between; align-items: center;
-        border-left: 5px solid #ec4899;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        border-left: 4px solid var(--primary);
     }
-    [data-theme="dark"] .med-item { background: rgba(0,0,0,0.2); }
-
-    /* --- Helper Classes --- */
-    .hidden { display: none; }
-    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .loader { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; margin: 0 auto 20px; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-
-    /* Modal */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 999; display: none; align-items: center; justify-content: center; }
-    .modal-box { background: #fff; padding: 40px; border-radius: 30px; text-align: center; width: 90%; max-width: 320px; animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    [data-theme="dark"] .modal-box { background: #1e293b; }
-    @keyframes popUp { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
+    .action-group button { border: none; background: none; font-size: 1.1rem; padding: 5px; cursor: pointer; opacity: 0.7; }
     
-    .theme-toggle { position: fixed; top: 20px; right: 20px; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(255,255,255,0.3); color: white; backdrop-filter: blur(5px); }
+    .hidden { display: none; }
+    .freq-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+    .freq-btn { padding: 10px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--input-bg); color: var(--text-muted); }
+    .freq-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    
+    .days-wrapper { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+    .day-pill {
+        width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+        border-radius: 12px; background: var(--input-bg); border: 1px solid var(--glass-border);
+        color: var(--text-muted); font-weight: 700; cursor: pointer; transition: 0.2s;
+    }
+    .day-pill.selected { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); }
+
+    /* --- Modals (Alert & Success) --- */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 999; display: none; align-items: center; justify-content: center; }
+    .modal-box { 
+        background: var(--glass-bg); padding: 30px; border-radius: 30px; 
+        text-align: center; width: 85%; max-width: 320px; position: relative;
+        border: 1px solid rgba(255,255,255,0.5);
+        animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popUp { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
+    .pulse-ring {
+        position: absolute; inset: -5px; border-radius: 35px; border: 2px solid var(--primary);
+        animation: pulse 1.5s infinite; opacity: 0; pointer-events: none;
+    }
+    @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.2); opacity: 0; } }
+    .success-icon { font-size: 4rem; margin-bottom: 10px; display: block; animation: bounce 1s infinite; }
+    @keyframes bounce { 0%, 100% {transform:translateY(0);} 50% {transform:translateY(-10px);} }
+
 </style>
 </head>
 <body>
 
-<button class="theme-toggle" onclick="toggleTheme()">🌗</button>
+<div class="top-controls">
+    <div class="control-group">
+        <button class="control-btn" id="wakelockBtn" onclick="System.toggleWakeLock()">📱 Always On</button>
+    </div>
+    <div class="control-group">
+        <button class="control-btn" onclick="toggleTheme()">🌗 Theme</button>
+        <button class="control-btn danger" onclick="Store.reset()" style="font-size:0.7rem;">Reset</button>
+    </div>
+</div>
 
 <div class="app-container">
 
     <div id="loginView" class="glass-card active">
-        <div style="text-align: center;">
-            <label for="u_img_input" class="profile-upload" id="profilePreview">
-                <i class="icon">📷</i>
-                <img id="previewImg" src="" alt="">
-            </label>
-            <input type="file" id="u_img_input" accept="image/*" hidden onchange="handleImageUpload(event)">
-            <p style="font-size:0.8rem; opacity:0.7; margin-top:-10px;">Tap to add photo</p>
-        </div>
+        <h1>HealthHub</h1>
+        <p class="sub">Ultimate Reminder System</p>
 
-        <h1>HealthHub Pro</h1>
-        <p class="sub">Wellness & Reminder System</p>
+        <label for="u_img_input" class="profile-upload" id="profilePreview">
+            <span class="icon-cam">📷</span>
+            <img id="previewImg" src="" alt="">
+        </label>
+        <input type="file" id="u_img_input" accept="image/*" hidden onchange="handleImageUpload(event)">
 
-        <label>Name</label>
-        <input type="text" id="u_name" placeholder="John Doe">
+        <label data-i18n="lang">Language</label>
+        <select id="u_lang" onchange="Lang.set(this.value)">
+            <option value="en">English</option>
+            <option value="hi">हिंदी (Hindi)</option>
+            <option value="gu">ગુજરાતી (Gujarati)</option>
+        </select>
 
-        <label>Date of Birth</label>
+        <label data-i18n="name">Your Name</label>
+        <input type="text" id="u_name" placeholder="Pratham Sukhadia">
+
+        <label data-i18n="dob">Date of Birth</label>
         <input type="date" id="u_dob">
 
-        <button class="btn-liquid" onclick="handleLogin()">Get Started</button>
-    </div>
-
-    <div id="loadingView" class="glass-card" style="text-align:center;">
-        <div class="loader"></div>
-        <h2>Setting up...</h2>
-        <p class="sub">Personalizing interface</p>
+        <button class="btn-liquid" onclick="handleLogin()" data-i18n="startBtn">Get Started</button>
     </div>
 
     <div id="appView" class="glass-card">
         <div class="app-header">
             <div class="user-info">
                 <img src="" id="appUserImg" class="user-avatar" style="display:none;">
-                <div id="defaultAvatar" class="user-avatar" style="display:flex;align-items:center;justify-content:center;background:var(--primary);color:white;">?</div>
+                <div id="defaultAvatar" class="user-avatar" style="display:flex;align-items:center;justify-content:center;background:var(--primary);color:white;font-weight:bold;">U</div>
                 <div>
-                    <div style="font-size:0.8rem; opacity:0.7;">Welcome back,</div>
+                    <div style="font-size:0.75rem; opacity:0.7;" data-i18n="welcome">Welcome,</div>
                     <div style="font-weight:700; font-size:1.1rem;" id="appNameDisplay">User</div>
+                    <div class="age-badge" id="ageDisplay">Age: --</div>
                 </div>
             </div>
             <div style="text-align:right;">
-                <div id="clockDisplay" style="font-weight:700;">00:00</div>
-                <div style="font-size:0.7rem; opacity:0.7;">Current Time</div>
+                <div id="clockDisplay" style="font-weight:700; font-size:1.2rem;">00:00</div>
+                <div style="font-size:0.6rem; color:var(--success);" id="lockStatus"></div>
             </div>
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('water')" id="tabWater">💧 Water</button>
-            <button class="tab" onclick="switchTab('med')" id="tabMed">💊 Medicine</button>
+            <button class="tab active" onclick="switchTab('water')" id="tabWater" data-i18n="tabWater">💧 Water</button>
+            <button class="tab" onclick="switchTab('med')" id="tabMed" data-i18n="tabMed">💊 Meds</button>
         </div>
 
         <div id="contentWater">
             <div id="waterSetup">
-                <p class="sub">Set daily hydration goal</p>
-                <label>Weight (kg)</label>
+                <p class="sub" data-i18n="waterSetupTitle">Hydration Setup</p>
+                
+                <label data-i18n="weight">Weight (kg)</label>
                 <input type="number" id="w_weight" placeholder="e.g. 70">
-                <div class="time-grid">
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <div>
-                        <label>Active Hours</label>
+                        <label data-i18n="activeHours">Active Hours</label>
                         <select id="w_hours">
                             <option value="8">8 Hours</option>
-                            <option value="12">12 Hours</option>
+                            <option value="12" selected>12 Hours</option>
+                            <option value="14">14 Hours</option>
+                            <option value="16">16 Hours</option>
                         </select>
                     </div>
                     <div>
                         <label>Interval</label>
                         <select id="w_interval">
-                            <option value="2">2 Min (Test)</option>
-                            <option value="30">30 Min</option>
-                            <option value="60">1 Hour</option>
+                            <option value="1">1 Min (Demo)</option>
+                            <option value="30">30 Mins</option>
+                            <option value="45">45 Mins</option>
+                            <option value="60">60 Mins</option>
                         </select>
                     </div>
                 </div>
-                <button class="btn-liquid" style="--primary:#0ea5e9;" onclick="WaterApp.start()">Start Tracking</button>
+
+                <button class="btn-liquid" style="--primary:#0ea5e9; margin-top:15px;" onclick="WaterApp.start()" data-i18n="trackBtn">Start Tracking</button>
             </div>
 
-            <div id="waterActive" class="hidden">
-                <div class="water-ring">
-                    <svg><circle class="ring-bg"></circle><circle class="ring-val" id="w_ring"></circle></svg>
-                    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
-                        <div id="w_timer" style="font-size:1.5rem; font-weight:700;">00:00</div>
-                        <div style="font-size:0.7rem; opacity:0.7;">Next Sip</div>
+            <div id="waterActive" class="hidden" style="text-align:center;">
+                <h1 id="w_timer" style="font-size:3rem; margin:20px 0; font-variant-numeric: tabular-nums;">00:00</h1>
+                <p class="sub" data-i18n="nextSip">Until next sip</p>
+                
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <div style="background:var(--input-bg); padding:15px; border-radius:15px; flex:1;">
+                        <strong id="w_count" style="font-size:1.4rem;">0</strong><br>
+                        <span style="font-size:0.8rem;" data-i18n="glass">Glasses</span>
+                    </div>
+                    <div style="background:var(--input-bg); padding:15px; border-radius:15px; flex:1;">
+                        <strong id="w_goal" style="font-size:1.4rem;">0L</strong><br>
+                        <span style="font-size:0.8rem;" data-i18n="goal">Daily Goal</span>
                     </div>
                 </div>
-                <div style="display:flex; justify-content:space-between; text-align:center; margin-bottom:20px;">
-                    <div style="background:var(--input-bg); padding:10px 20px; border-radius:15px; flex:1; margin-right:10px;">
-                        <div style="font-size:1.2rem; font-weight:700;" id="w_count">0</div>
-                        <div style="font-size:0.7rem;">Glasses</div>
-                    </div>
-                    <div style="background:var(--input-bg); padding:10px 20px; border-radius:15px; flex:1; margin-left:10px;">
-                        <div style="font-size:1.2rem; font-weight:700;" id="w_goal">0L</div>
-                        <div style="font-size:0.7rem;">Goal</div>
-                    </div>
-                </div>
-                <button class="btn-liquid" style="background: linear-gradient(90deg, #0ea5e9, #6366f1);" onclick="WaterApp.drink()">🥤 Log Glass</button>
+                <button class="btn-liquid" onclick="WaterApp.drink()" data-i18n="logWater">🥤 Drink Water</button>
             </div>
         </div>
 
         <div id="contentMed" class="hidden">
-            <p class="sub" style="margin-bottom:15px;">Medication schedule.</p>
-            
-            <label>Medicine Name</label>
-            <input type="text" id="m_name" placeholder="e.g. Aspirin">
+            <div id="medForm">
+                <p class="sub" data-i18n="medTitle">Add Medication</p>
+                <input type="hidden" id="m_edit_id"> 
+                
+                <input type="text" id="m_name" placeholder="Medicine Name">
 
-            <label>Doses per day</label>
-            <div class="freq-grid">
-                <button class="freq-btn active" onclick="MedApp.setFreq(1)">1</button>
-                <button class="freq-btn" onclick="MedApp.setFreq(2)">2</button>
-                <button class="freq-btn" onclick="MedApp.setFreq(3)">3</button>
-                <button class="freq-btn" onclick="MedApp.setFreq(4)">4</button>
-            </div>
-
-            <label>Set Times</label>
-            <div id="timeInputs" class="time-grid" style="margin-bottom:20px;">
-                <input type="time">
-            </div>
-
-            <label>Select Days</label>
-            <div class="days-wrapper" id="daySelect">
+                <label data-i18n="freq">Frequency (Per Day)</label>
+                <div class="freq-grid">
+                    <button class="freq-btn active" onclick="MedApp.setFreq(1)">1</button>
+                    <button class="freq-btn" onclick="MedApp.setFreq(2)">2</button>
+                    <button class="freq-btn" onclick="MedApp.setFreq(3)">3</button>
+                    <button class="freq-btn" onclick="MedApp.setFreq(4)">4</button>
                 </div>
-            
-            <label>Message to Speak</label>
-            <input type="text" id="m_msg" placeholder="e.g. Take with warm water">
 
-            <button class="btn-liquid" style="background: linear-gradient(90deg, #ec4899, #8b5cf6);" onclick="MedApp.add()">Add Schedule</button>
+                <label data-i18n="time">Set Times</label>
+                <div id="timeInputs" class="time-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                    <input type="time">
+                </div>
+
+                <label data-i18n="days">Select Days</label>
+                <div class="days-wrapper" id="daySelect"></div>
+                
+                <label data-i18n="msg">Voice Message</label>
+                <input type="text" id="m_msg" placeholder="e.g. Take after food">
+
+                <button class="btn-liquid" id="saveMedBtn" style="background: linear-gradient(90deg, #ec4899, #8b5cf6);" onclick="MedApp.save()" data-i18n="saveMed">Add Schedule</button>
+                <button class="btn-liquid hidden" id="cancelEditBtn" style="background:#64748b; margin-top:10px;" onclick="MedApp.clearForm()" data-i18n="cancel">Cancel</button>
+            </div>
             
-            <div style="margin-top:25px; max-height:200px; overflow-y:auto;" id="medList"></div>
+            <div style="margin-top:25px; border-top:1px solid var(--glass-border); padding-top:10px;">
+                <h4 style="margin:0 0 10px 0; opacity:0.7;" data-i18n="yourMeds">Your Medicines</h4>
+                <div id="medList"></div>
+            </div>
         </div>
 
     </div>
-
 </div>
 
 <div class="modal-overlay" id="alertModal">
     <div class="modal-box">
-        <div style="font-size:3rem; margin-bottom:10px;">⏰</div>
-        <h2 id="alertTitle">Alert</h2>
-        <p class="sub" id="alertMsg">Time to take action</p>
-        <button class="btn-liquid" onclick="AudioSys.stop()">Dismiss</button>
+        <div class="pulse-ring"></div>
+        <div style="font-size:3.5rem; margin-bottom:15px; animation: bounce 1s infinite;">⏰</div>
+        <h2 id="alertTitle" style="color:var(--text);">Alert</h2>
+        <p id="alertMsg" style="color:var(--text-muted); margin-bottom:25px; font-size:1.1rem;"></p>
+        <button class="btn-liquid" onclick="System.stopAlert(true)" data-i18n="takenBtn">✅ I've Taken It</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="successModal">
+    <div class="modal-box">
+        <span class="success-icon">🎉</span>
+        <h2 data-i18n="greatJob">Great Job!</h2>
+        <p id="successMsg" class="sub"></p>
+        <button class="btn-liquid" style="--primary:#10b981;" onclick="document.getElementById('successModal').style.display='none'">Close</button>
     </div>
 </div>
 
 <script>
-    /* --- 0. THEME & UTILS --- */
-    function toggleTheme() {
-        const b = document.body;
-        b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    }
-    
-    // Generate Day Pills
-    const days = ['M','T','W','T','F','S','S'];
-    const dayCon = document.getElementById('daySelect');
-    days.forEach((d,i) => {
-        const pill = document.createElement('div');
-        pill.className = 'day-pill';
-        pill.innerText = d;
-        pill.dataset.value = i === 6 ? 0 : i + 1; // 0=Sun, 1=Mon
-        pill.onclick = function() {
-            this.classList.toggle('selected');
+    /* --- 0. LOCAL STORAGE MANAGER --- */
+    const Store = {
+        saveUser: (data) => localStorage.setItem('hh_user', JSON.stringify(data)),
+        getUser: () => JSON.parse(localStorage.getItem('hh_user')),
+        
+        saveMeds: (list) => localStorage.setItem('hh_meds', JSON.stringify(list)),
+        getMeds: () => JSON.parse(localStorage.getItem('hh_meds')) || [],
+        
+        saveWater: (data) => localStorage.setItem('hh_water', JSON.stringify(data)),
+        getWater: () => JSON.parse(localStorage.getItem('hh_water')),
+        
+        reset: () => {
+            if(confirm("Clear all data and restart?")) {
+                localStorage.clear();
+                location.reload();
+            }
         }
-        dayCon.appendChild(pill);
-    });
+    };
 
-    /* --- 1. AUDIO SYSTEM + TTS --- */
+    /* --- 1. LANGUAGE SYSTEM --- */
+    const Lang = {
+        curr: 'en',
+        dict: {
+            en: {
+                lang: "Language", name: "Your Name", dob: "Date of Birth", startBtn: "Get Started",
+                welcome: "Welcome,", tabWater: "💧 Water", tabMed: "💊 Meds",
+                waterSetupTitle: "Hydration Setup", weight: "Weight (kg)", activeHours: "Active Hours", trackBtn: "Start Tracking",
+                nextSip: "Until next sip", glass: "Glasses", goal: "Daily Goal", logWater: "🥤 Drink Water",
+                medTitle: "Add Medication", freq: "Frequency", time: "Set Times", days: "Select Days", msg: "Voice Message",
+                saveMed: "Add Schedule", cancel: "Cancel", yourMeds: "Your Medicines",
+                takenBtn: "✅ I've Taken It", greatJob: "Great Job!",
+                alertWater: "Time to hydrate!", alertWaterMsg: "Drink a glass of water now.",
+                alertMed: "Medication Time", 
+                completeWater: "Daily Goal Reached!", completeMed: "Medicine Logged."
+            },
+            hi: {
+                lang: "भाषा (Language)", name: "आपका नाम", dob: "जन्म तारीख", startBtn: "शुरू करें",
+                welcome: "स्वागत है,", tabWater: "💧 पानी", tabMed: "💊 दवा",
+                waterSetupTitle: "पानी का सेटअप", weight: "वजन (kg)", activeHours: "सक्रिय घंटे", trackBtn: "ट्रैकिंग शुरू करें",
+                nextSip: "अगली घूंट तक", glass: "गिलास", goal: "लक्ष्य", logWater: "🥤 पानी पियें",
+                medTitle: "दवा जोड़ें", freq: "आवृत्ति (दिन में)", time: "समय सेट करें", days: "दिन चुनें", msg: "आवाज़ संदेश",
+                saveMed: "शेड्यूल जोड़ें", cancel: "रद्द करें", yourMeds: "आपकी दवाएं",
+                takenBtn: "✅ मैंने ले लिया", greatJob: "बहुत बढ़िया!",
+                alertWater: "पानी पीने का समय!", alertWaterMsg: "अभी एक गिलास पानी पियें।",
+                alertMed: "दवा का समय",
+                completeWater: "आज का लक्ष्य पूरा हुआ!", completeMed: "दवा ले ली गई।"
+            },
+            gu: {
+                lang: "ભાષા (Language)", name: "તમારું નામ", dob: "જન્મ તારીખ", startBtn: "શરૂ કરો",
+                welcome: "સ્વાગત છે,", tabWater: "💧 પાણી", tabMed: "💊 દવા",
+                waterSetupTitle: "પાણી સેટઅપ", weight: "વજન (kg)", activeHours: "સક્રિય કલાકો", trackBtn: "ટ્રેકિંગ શરૂ કરો",
+                nextSip: "આગામી ઘૂંટ", glass: "ગ્લાસ", goal: "લક્ષ્ય", logWater: "🥤 પાણી પીવો",
+                medTitle: "દવા ઉમેરો", freq: "આવર્તન", time: "સમય સેટ કરો", days: "દિવસો પસંદ કરો", msg: "અવાજ સંદેશ",
+                saveMed: "શિડ્યુલ ઉમેરો", cancel: "રદ કરો", yourMeds: "તમારી દવાઓ",
+                takenBtn: "✅ મેં લઈ લીધું", greatJob: "ખૂબ સરસ!",
+                alertWater: "પાણી પીવાનો સમય!", alertWaterMsg: "હવે એક ગ્લાસ પાણી પીવો.",
+                alertMed: "દવાનો સમય",
+                completeWater: "દૈનિક લક્ષ્ય પૂર્ણ!", completeMed: "દવા નોંધાઈ ગઈ."
+            }
+        },
+        set: (code) => {
+            Lang.curr = code;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(Lang.dict[code][key]) el.innerText = Lang.dict[code][key];
+            });
+        },
+        get: (key) => Lang.dict[Lang.curr][key] || key
+    };
+
+    /* --- 2. SYSTEM CORE --- */
+    const System = {
+        wakeLock: null, alertInt: null,
+        init: async () => { if ("Notification" in window) await Notification.requestPermission(); },
+        toggleWakeLock: async () => {
+            const btn = document.getElementById('wakelockBtn');
+            if (System.wakeLock) {
+                System.wakeLock.release(); System.wakeLock = null;
+                btn.classList.remove('active'); document.getElementById('lockStatus').innerText = "";
+            } else {
+                try {
+                    System.wakeLock = await navigator.wakeLock.request('screen');
+                    btn.classList.add('active');
+                    document.getElementById('lockStatus').innerText = "⚡ ON";
+                } catch(e) { alert("WakeLock failed"); }
+            }
+        },
+        trigger: (title, msg, speakText) => {
+            const modal = document.getElementById('alertModal');
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMsg').innerText = msg;
+            modal.style.display = 'flex';
+            if(Notification.permission === "granted") new Notification(title, { body: msg });
+            const action = () => {
+                AudioSys.playTone();
+                AudioSys.speak(speakText);
+                if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
+            };
+            action();
+            System.alertInt = setInterval(action, 5000);
+        },
+        stopAlert: (isSuccess = false) => {
+            clearInterval(System.alertInt);
+            if(window.speechSynthesis) window.speechSynthesis.cancel();
+            if(navigator.vibrate) navigator.vibrate(0);
+            document.getElementById('alertModal').style.display = 'none';
+            if(isSuccess) {
+                const sModal = document.getElementById('successModal');
+                sModal.style.display = 'flex';
+                document.getElementById('successMsg').innerText = "Reminder Completed";
+                setTimeout(() => { sModal.style.display = 'none'; }, 3000);
+            }
+        }
+    };
+
     const AudioSys = {
-        ctx: null, interval: null,
+        ctx: null,
         init: () => { if(!AudioSys.ctx) AudioSys.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
         playTone: () => {
             if(!AudioSys.ctx) AudioSys.init();
@@ -395,47 +494,64 @@
             const osc = AudioSys.ctx.createOscillator();
             const gain = AudioSys.ctx.createGain();
             osc.connect(gain); gain.connect(AudioSys.ctx.destination);
-            osc.type = 'sine'; osc.frequency.value = 600;
-            gain.gain.setValueAtTime(0.5, AudioSys.ctx.currentTime);
+            osc.frequency.value = 600; 
             gain.gain.exponentialRampToValueAtTime(0.01, AudioSys.ctx.currentTime + 0.5);
             osc.start(); osc.stop(AudioSys.ctx.currentTime + 0.5);
         },
         speak: (text) => {
             if('speechSynthesis' in window) {
                 const utter = new SpeechSynthesisUtterance(text);
+                if(Lang.curr === 'hi') utter.lang = 'hi-IN';
+                if(Lang.curr === 'gu') utter.lang = 'gu-IN';
                 window.speechSynthesis.speak(utter);
             }
-        },
-        trigger: (title, msg, speakText) => {
-            document.getElementById('alertModal').style.display = 'flex';
-            document.getElementById('alertTitle').innerText = title;
-            document.getElementById('alertMsg').innerText = msg;
-            
-            const action = () => {
-                AudioSys.playTone();
-                if(speakText) AudioSys.speak(speakText);
-                if(navigator.vibrate) navigator.vibrate([400, 200, 400]);
-            };
-            action();
-            AudioSys.interval = setInterval(action, 4000); // Repeat every 4s to allow speech to finish
-        },
-        stop: () => {
-            clearInterval(AudioSys.interval);
-            if(window.speechSynthesis) window.speechSynthesis.cancel();
-            document.getElementById('alertModal').style.display = 'none';
         }
     };
 
-    /* --- 2. IMAGE UPLOAD --- */
+    /* --- 3. LOGIN & APP STATE --- */
+    window.onload = function() {
+        const savedUser = Store.getUser();
+        if(savedUser) {
+            // Restore User
+            document.getElementById('u_name').value = savedUser.name;
+            document.getElementById('u_dob').value = savedUser.dob;
+            document.getElementById('u_lang').value = savedUser.lang;
+            Lang.set(savedUser.lang);
+            
+            if(savedUser.img) {
+                document.getElementById('appUserImg').src = savedUser.img;
+                document.getElementById('appUserImg').style.display = 'block';
+                document.getElementById('defaultAvatar').style.display = 'none';
+            }
+            
+            // Skip Login
+            handleLogin(true);
+
+            // Restore Water if Active
+            const savedWater = Store.getWater();
+            if(savedWater && savedWater.active) {
+                document.getElementById('w_weight').value = savedWater.weight;
+                document.getElementById('w_hours').value = savedWater.hours;
+                document.getElementById('w_interval').value = savedWater.interval;
+                WaterApp.count = savedWater.count || 0;
+                WaterApp.start(true); // Restart with saved state
+            }
+
+            // Restore Meds
+            MedApp.items = Store.getMeds();
+            MedApp.render();
+        }
+    };
+
     function handleImageUpload(e) {
         const file = e.target.files[0];
         if(file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('previewImg').src = e.target.result;
+            reader.onload = (e) => {
+                const src = e.target.result;
+                document.getElementById('previewImg').src = src;
                 document.getElementById('previewImg').style.display = 'block';
-                document.querySelector('.profile-upload i').style.display = 'none';
-                document.getElementById('appUserImg').src = e.target.result;
+                document.getElementById('appUserImg').src = src;
                 document.getElementById('appUserImg').style.display = 'block';
                 document.getElementById('defaultAvatar').style.display = 'none';
             }
@@ -443,79 +559,116 @@
         }
     }
 
-    /* --- 3. LOGIN LOGIC --- */
-    function handleLogin() {
+    function handleLogin(skipSave = false) {
         const name = document.getElementById('u_name').value;
-        if(!name) return alert("Please enter your name");
+        const dob = document.getElementById('u_dob').value;
+        const lang = document.getElementById('u_lang').value;
+        const img = document.getElementById('previewImg').src;
+
+        if(!name || !dob) return alert("Please fill Name and DOB");
+
+        if(!skipSave) {
+            Store.saveUser({ name, dob, lang, img: img.includes('data:') ? img : null });
+        }
+
         document.getElementById('appNameDisplay').innerText = name;
         document.getElementById('loginView').classList.remove('active');
-        document.getElementById('loadingView').classList.add('active');
-        setTimeout(() => {
-            document.getElementById('loadingView').classList.remove('active');
-            document.getElementById('appView').classList.add('active');
-            AudioSys.init();
-            WaterApp.initClock();
-            MedApp.startClock();
-        }, 2000);
+        document.getElementById('appView').classList.add('active');
+        System.init();
+
+        // Age Calc
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+        
+        let count = 0;
+        const ageBadge = document.getElementById('ageDisplay');
+        const interval = setInterval(() => {
+            ageBadge.innerText = `Age: ${count}`;
+            if(count >= age) clearInterval(interval);
+            count++;
+        }, 30);
+
+        setInterval(() => document.getElementById('clockDisplay').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 1000);
+        MedApp.startWatcher();
     }
 
-    /* --- 4. TABS --- */
-    function switchTab(t) {
-        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-        document.getElementById(t === 'water' ? 'tabWater' : 'tabMed').classList.add('active');
-        document.getElementById('contentWater').className = t === 'water' ? '' : 'hidden';
-        document.getElementById('contentMed').className = t === 'med' ? '' : 'hidden';
-    }
-
-    /* --- 5. WATER APP --- */
+    /* --- 4. WATER APP --- */
     const WaterApp = {
-        timer: null, max: 0, cur: 0, timeLeft: 0, totalTime: 0,
-        initClock: () => {
-            setInterval(() => {
-                const now = new Date();
-                document.getElementById('clockDisplay').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            }, 1000);
-        },
-        start: () => {
+        timer: null, timeLeft: 0, totalTime: 0, count: 0, goal: 0,
+        start: (isRestoring = false) => {
             const w = document.getElementById('w_weight').value;
-            const int = document.getElementById('w_interval').value;
+            const hours = document.getElementById('w_hours').value;
+            const intervalVal = document.getElementById('w_interval').value; // Get dropdown value
+            
             if(!w) return alert("Enter weight");
-            WaterApp.max = Math.ceil((w * 0.033 * 1000) / 250);
-            document.getElementById('w_goal').innerText = (w * 0.033).toFixed(1) + 'L';
-            WaterApp.totalTime = int * 60;
+
+            const totalMl = w * 33; 
+            WaterApp.goal = (totalMl / 1000).toFixed(1);
+            
+            // Interval Logic
+            if(intervalVal == "1") {
+                 WaterApp.totalTime = 60; // 1 Min Demo
+            } else {
+                 WaterApp.totalTime = parseInt(intervalVal) * 60; // Real minutes to seconds
+            }
+
+            document.getElementById('w_goal').innerText = WaterApp.goal + 'L';
+            
+            // Save settings
+            if(!isRestoring) {
+                Store.saveWater({ active: true, weight: w, hours, interval: intervalVal, count: 0 });
+            }
+
             document.getElementById('waterSetup').classList.add('hidden');
             document.getElementById('waterActive').classList.remove('hidden');
-            WaterApp.resetTimer();
+            document.getElementById('w_count').innerText = WaterApp.count; // Update UI if restoring
+            WaterApp.reset();
         },
-        resetTimer: () => {
+        reset: () => {
             clearInterval(WaterApp.timer);
             WaterApp.timeLeft = WaterApp.totalTime;
-            WaterApp.updateRing();
+            WaterApp.updateDisplay();
             WaterApp.timer = setInterval(() => {
                 WaterApp.timeLeft--;
-                WaterApp.updateRing();
+                WaterApp.updateDisplay();
                 if(WaterApp.timeLeft <= 0) {
                     clearInterval(WaterApp.timer);
-                    AudioSys.trigger("Hydrate!", "Time to drink water", "It is time to drink water");
+                    System.trigger(Lang.get('alertWater'), Lang.get('alertWaterMsg'), Lang.get('alertWater'));
                 }
             }, 1000);
         },
-        updateRing: () => {
-            const min = Math.floor(WaterApp.timeLeft / 60).toString().padStart(2,'0');
-            const sec = (WaterApp.timeLeft % 60).toString().padStart(2,'0');
-            document.getElementById('w_timer').innerText = `${min}:${sec}`;
-            const offset = 440 - (440 * (WaterApp.timeLeft / WaterApp.totalTime));
-            document.getElementById('w_ring').style.strokeDashoffset = offset;
+        updateDisplay: () => {
+            const h = Math.floor(WaterApp.timeLeft / 3600).toString().padStart(2,'0');
+            const m = Math.floor((WaterApp.timeLeft % 3600) / 60).toString().padStart(2,'0');
+            const s = (WaterApp.timeLeft % 60).toString().padStart(2,'0');
+            document.getElementById('w_timer').innerText = `${h}:${m}:${s}`;
         },
         drink: () => {
-            WaterApp.cur++;
-            document.getElementById('w_count').innerText = WaterApp.cur;
-            AudioSys.stop();
-            if(WaterApp.cur >= WaterApp.max) { alert("Goal Reached!"); clearInterval(WaterApp.timer); } else { WaterApp.resetTimer(); }
+            WaterApp.count++;
+            document.getElementById('w_count').innerText = WaterApp.count;
+            
+            // Update Storage
+            const saved = Store.getWater();
+            if(saved) { saved.count = WaterApp.count; Store.saveWater(saved); }
+
+            const currentL = (WaterApp.count * 0.25);
+            if(currentL >= WaterApp.goal) {
+                System.stopAlert();
+                document.getElementById('successMsg').innerText = Lang.get('completeWater');
+                document.getElementById('successModal').style.display = 'flex';
+                clearInterval(WaterApp.timer);
+                document.getElementById('w_timer').innerText = "DONE";
+            } else {
+                System.stopAlert();
+                WaterApp.reset();
+            }
         }
     };
 
-    /* --- 6. MED APP --- */
+    /* --- 5. MED APP --- */
     const MedApp = {
         items: [],
         setFreq: (n) => {
@@ -526,35 +679,72 @@
                 const inp = document.createElement('input'); inp.type = 'time'; con.appendChild(inp);
             }
         },
-        add: () => {
+        save: () => {
+            const id = document.getElementById('m_edit_id').value;
             const name = document.getElementById('m_name').value;
-            const msg = document.getElementById('m_msg').value || `Take ${name}`; // Get speech text
+            const msg = document.getElementById('m_msg').value;
             const times = Array.from(document.querySelectorAll('#timeInputs input')).map(i => i.value).filter(v => v);
             const days = Array.from(document.querySelectorAll('.day-pill.selected')).map(c => c.dataset.value);
+
+            if(!name || !times.length || !days.length) return alert("Incomplete details");
+
+            if(id) {
+                const idx = MedApp.items.findIndex(i => i.id == id);
+                if(idx > -1) MedApp.items[idx] = { id: parseInt(id), name, times, days, msg };
+            } else {
+                MedApp.items.push({ id: Date.now(), name, times, days, msg });
+            }
             
-            if(!name || times.length === 0 || days.length === 0) return alert("Fill all details");
-            
-            MedApp.items.push({ id: Date.now(), name, times, days, msg });
+            Store.saveMeds(MedApp.items); // Save to storage
+            MedApp.clearForm();
             MedApp.render();
+        },
+        edit: (id) => {
+            const item = MedApp.items.find(i => i.id === id);
+            if(!item) return;
+            document.getElementById('m_edit_id').value = item.id;
+            document.getElementById('m_name').value = item.name;
+            document.getElementById('m_msg').value = item.msg;
+            MedApp.setFreq(item.times.length);
+            const inputs = document.querySelectorAll('#timeInputs input');
+            item.times.forEach((t, i) => { if(inputs[i]) inputs[i].value = t; });
+            document.querySelectorAll('.day-pill').forEach(p => {
+                p.classList.toggle('selected', item.days.includes(p.dataset.value));
+            });
+            document.getElementById('saveMedBtn').innerText = "Update";
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+        },
+        del: (id) => {
+            if(confirm("Delete?")) {
+                MedApp.items = MedApp.items.filter(i => i.id !== id);
+                Store.saveMeds(MedApp.items); // Save removal
+                MedApp.render();
+            }
+        },
+        clearForm: () => {
+            document.getElementById('m_edit_id').value = '';
             document.getElementById('m_name').value = '';
             document.getElementById('m_msg').value = '';
             MedApp.setFreq(1);
             document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('selected'));
+            document.getElementById('saveMedBtn').innerText = Lang.get('saveMed');
+            document.getElementById('cancelEditBtn').classList.add('hidden');
         },
         render: () => {
-            const list = document.getElementById('medList');
-            list.innerHTML = MedApp.items.map(item => `
+            document.getElementById('medList').innerHTML = MedApp.items.map(i => `
                 <div class="med-item">
                     <div>
-                        <div style="font-weight:700;">${item.name}</div>
-                        <div style="font-size:0.8rem; opacity:0.7;">${item.times.join(', ')}</div>
+                        <div style="font-weight:700;">${i.name}</div>
+                        <div style="font-size:0.8rem; opacity:0.7;">${i.times.join(', ')}</div>
                     </div>
-                    <button onclick="MedApp.del(${item.id})" style="border:none; background:none; color:red; font-size:1.2rem;">×</button>
+                    <div class="action-group">
+                        <button onclick="MedApp.edit(${i.id})">✏️</button>
+                        <button onclick="MedApp.del(${i.id})" style="color:var(--danger)">🗑️</button>
+                    </div>
                 </div>
             `).join('');
         },
-        del: (id) => { MedApp.items = MedApp.items.filter(i => i.id !== id); MedApp.render(); },
-        startClock: () => {
+        startWatcher: () => {
             setInterval(() => {
                 const now = new Date();
                 if(now.getSeconds() === 0) {
@@ -562,17 +752,33 @@
                     const dStr = String(now.getDay());
                     MedApp.items.forEach(item => {
                         if(item.days.includes(dStr) && item.times.includes(tStr)) {
-                            // Trigger with custom speech message
-                            AudioSys.trigger("Medicine Time", `Take ${item.name}`, item.msg);
+                            System.trigger(Lang.get('alertMed'), `${item.name}`, item.msg || item.name);
                         }
                     });
                 }
             }, 1000);
         }
     };
-    
-    // Init
-    MedApp.setFreq(1);
+
+    function switchTab(t) {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.getElementById(t === 'water' ? 'tabWater' : 'tabMed').classList.add('active');
+        document.getElementById('contentWater').className = t === 'water' ? '' : 'hidden';
+        document.getElementById('contentMed').className = t === 'med' ? '' : 'hidden';
+    }
+    function toggleTheme() {
+        const b = document.body;
+        b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    }
+    const daysArr = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const dayCon = document.getElementById('daySelect');
+    daysArr.forEach((d,i) => {
+        const pill = document.createElement('div');
+        pill.className = 'day-pill'; pill.innerText = d[0]; 
+        pill.dataset.value = i === 6 ? 0 : i + 1; 
+        pill.onclick = function() { this.classList.toggle('selected'); }
+        dayCon.appendChild(pill);
+    });
 </script>
 </body>
 </html>
